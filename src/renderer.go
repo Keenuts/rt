@@ -1,10 +1,11 @@
 package main
 
 import (
-    "image";
-    "fmt";
-    "sync";
-    "image/draw";
+    "fmt"
+    "image"
+    "image/draw"
+    "sync"
+    "time"
 );
 
 type Task struct {
@@ -61,7 +62,7 @@ func RenderScene(config Config, scene Scene) (output *image.RGBA) {
     var blockCount = len(taskList)
     var mux sync.Mutex
 
-    wg.Add(config.MaxThreads)
+    wg.Add(config.MaxThreads + 1)
 
     for i := 0; i < config.MaxThreads; i++ {
         go func () {
@@ -82,14 +83,25 @@ func RenderScene(config Config, scene Scene) (output *image.RGBA) {
 
                 mux.Lock()
                 blockList = append(blockList, t)
-                fmt.Printf("done: %d/%d\r", len(blockList), blockCount)
+
+                //fmt.Printf("done: %d/%d\r", len(blockList), blockCount)
                 mux.Unlock()
             }
         }()
     }
 
-    wg.Wait()
-    fmt.Printf("\noutputing now.\n")
+    go func() {
+        defer wg.Done()
 
+        for len(blockList) < blockCount {
+            fmt.Printf("done: %d/%d\r", len(blockList), blockCount)
+            time.Sleep(2e8)
+        }
+        fmt.Printf("done: %d/%d\n", blockCount, blockCount)
+    }()
+
+    wg.Wait()
+
+    fmt.Printf("\noutputing now.\n")
     return RenderWeldBlocks(scene, blockList)
 }
