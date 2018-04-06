@@ -1,0 +1,5 @@
+{
+    "maxThreads": 8,
+    "blockSize": 16,
+    "outputPath": "/tmp/output.png"
+}
