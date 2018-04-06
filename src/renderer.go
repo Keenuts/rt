@@ -5,7 +5,6 @@ import (
     "fmt";
     "sync";
     "image/draw";
-    "image/color";
 );
 
 type Task struct {
@@ -17,13 +16,14 @@ func RenderArea(config Config, scene Scene, task *Task) {
     rect := image.Rect(0, 0, config.BlockSize, config.BlockSize)
     task.Buffer = image.NewRGBA(rect)
 
+    for y := 0; y < config.BlockSize; y++ {
+        for x := 0; x < config.BlockSize; x++ {
 
-    r := (float32(task.Area.Min.X) / 512.) * 255.
-    g := (float32(task.Area.Min.Y) / 512.) * 255.
-
-    c := color.RGBA{uint8(r), uint8(g), 128, 255}
-
-    draw.Draw(task.Buffer, rect, &image.Uniform{c}, image.ZP, draw.Src)
+            r := ScreenPointToRay(scene, task.Area.Min.X + x, task.Area.Min.Y + y)
+            px := TraceRay(config, scene, r)
+            task.Buffer.Set(x, y, px)
+        }
+    }
 }
 
 func CreateRenderTasks(config Config, scene Scene) (taskList []Task) {
@@ -59,23 +59,34 @@ func RenderScene(config Config, scene Scene) (output *image.RGBA) {
 
     var wg sync.WaitGroup
     var blockCount = len(taskList)
+    var mux sync.Mutex
 
-    wg.Add(1)
+    wg.Add(config.MaxThreads)
 
-    go func () {
-        defer wg.Done()
+    for i := 0; i < config.MaxThreads; i++ {
+        go func () {
+            defer wg.Done()
 
-        for len(taskList) > 0 {
+            for len(taskList) > 0 {
 
-            t := taskList[0]
-            taskList = taskList[1:]
+                mux.Lock()
+                if len(taskList) == 0 {
+                    mux.Unlock()
+                    break
+                }
+                t := taskList[0]
+                taskList = taskList[1:]
+                mux.Unlock()
 
-            RenderArea(config, scene, &t)
-            blockList = append(blockList, t)
+                RenderArea(config, scene, &t)
 
-            fmt.Printf("done: %d/%d\r", len(blockList), blockCount)
-        }
-    }()
+                mux.Lock()
+                blockList = append(blockList, t)
+                fmt.Printf("done: %d/%d\r", len(blockList), blockCount)
+                mux.Unlock()
+            }
+        }()
+    }
 
     wg.Wait()
     fmt.Printf("\noutputing now.\n")
