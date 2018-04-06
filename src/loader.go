@@ -8,12 +8,6 @@ import (
     "os";
 );
 
-// For now, objects are only sheres.
-type Object struct {
-    Name string
-    Radius int
-}
-
 type SceneObject struct {
     ObjectID int
     Position Vector
@@ -21,10 +15,17 @@ type SceneObject struct {
     Scale Vector
 }
 
+type Camera struct {
+    Position, Forward, Up Vector
+    Fov float32
+}
+
 type Scene struct {
     Name string
     OutputSize [2]int
 
+    Camera Camera
+    Models []string
     Objects []Object
     Scene []SceneObject
 
@@ -55,6 +56,11 @@ func LoadJSON(filename string, storage interface{}) {
 func LoadScene(filename string) Scene {
     var out Scene
     LoadJSON(filename, &out)
+
+    for _,m := range out.Models {
+        out.Objects = append(out.Objects, CreateObjectFromOBJ(m))
+    }
+
     return out
 }
 
