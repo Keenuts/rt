@@ -1,18 +1,22 @@
 {
     "name": "default-scene",
-    "outputSize": [ 512, 512 ],
+    "outputSize": [ 128, 128 ],
 
-    "objects": [
-        {
-            "name": "sphere",
-            "radius": 5
-        }
+    "Camera": {
+            "position": { "x":0, "y":0, "z":-10 },
+            "forward": { "x":0, "y":0, "z":1 },
+            "up": { "x":0, "y":1, "z":0 },
+            "fov": 45.0
+    },
+
+    "Models": [
+            "square.obj"
     ],
 
     "scene": [
         {
             "objectId": 0,
-            "position": { "x":0, "y":0, "z":0 },
+            "position": { "x":10, "y":0, "z":0 },
             "rotation": { "x":0, "y":180, "z":0 },
             "scale":    { "x":1, "y":1, "z":1 }
         }
