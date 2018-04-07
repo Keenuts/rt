@@ -17,8 +17,11 @@ type Triangle struct {
 
 type Object struct {
     Name string
+    Center Vector
     Bounds Box
     Triangles []Triangle
+
+    Vertex []Vector
 }
 
 func ObjectCreateFromOBJ(filename string) (o Object) {
@@ -40,17 +43,33 @@ func ObjectCreateFromOBJ(filename string) (o Object) {
         panic("Invalid mesh. Indices count not a multiple of 3.")
     }
 
-    for i := 0; i < len(obj.Indices); i += 3 {
-        v := make([]Vector, 3)
+    for i := 0; i < len(obj.Coord); i += 8 {
+        o.Vertex = append(o.Vertex, Vector{ obj.Coord[i + 0],
+                                            obj.Coord[i + 1],
+                                            obj.Coord[i + 2]})
+    }
 
-        for j := 0 ; j < 3; j++ {
-            v[j] = Vector{obj.Coord[obj.Indices[i + j] * 8 + 0],
-                          obj.Coord[obj.Indices[i + j] * 8 + 1],
-                          obj.Coord[obj.Indices[i + j] * 8 + 2]}
+    for i := 0; i < len(obj.Indices); i += 3 {
+        t := Triangle {
+            o.Vertex[obj.Indices[i + 0]],
+            o.Vertex[obj.Indices[i + 1]],
+            o.Vertex[obj.Indices[i + 2]],
         }
-        t := Triangle{ v[0], v[1], v[2] }
         o.Triangles = append(o.Triangles, t)
     }
 
+    o.Center = ObjectFindCenter(o)
     return
+}
+
+func ObjectFindCenter(o Object) Vector {
+    var sum Vector
+    var count float32
+
+    for _, vtx := range o.Vertex {
+        sum = sum.Add(vtx)
+        count += 1.
+    }
+
+    return sum.MulScal(1. / count)
 }
