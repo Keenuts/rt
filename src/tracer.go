@@ -36,7 +36,7 @@ func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
     ac := t.C.Sub(t.A).Normalize()
     normal := ab.Cross(ac).Normalize()
 
-    if normal.Dot(r.Direction) > 0 {
+    if normal.Dot(r.Direction) < 0 {
         return false, Intersection{}
     }
 
