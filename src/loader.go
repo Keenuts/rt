@@ -55,15 +55,16 @@ func LoadConfig(filename string) Config {
     return out
 }
 
-func GetFileHandleToDisk(config Config, prefix string, filename string) *os.File {
+func GetFileHandleToDisk(config Config, prefix string, ext string, alt string) *os.File {
     if !CreateDirectory(config.OutputDir) {
         panic("unable to create output directory")
     }
 
+    filename := ""
     if config.ForceOutputName {
-        filename = path.Join(config.OutputDir, filename)
+        filename = path.Join(config.OutputDir, alt)
     } else {
-        filename = prefix + time.Now().Format("2006-01-02--15-04-05") + ".json"
+        filename = prefix + time.Now().Format("2006-01-02--15-04-05") + ext
         filename = path.Join(config.OutputDir, filename)
     }
 
@@ -87,7 +88,7 @@ func WriteReportToDisk(config Config, infos RenderInfo) {
         panic("unable to serialize rendering informations")
     }
 
-    f := GetFileHandleToDisk(config, "report-", config.ReportName)
+    f := GetFileHandleToDisk(config, "report-", ".json", config.ReportName)
     defer f.Close()
 
     f.Write(raw)
@@ -98,7 +99,7 @@ func WriteImageToDisk(config Config, buffer *image.RGBA) {
         return
     }
 
-    f := GetFileHandleToDisk(config, "output-", config.PictureName)
+    f := GetFileHandleToDisk(config, "output-", ".png", config.PictureName)
     defer f.Close()
 
     png.Encode(f, buffer);
