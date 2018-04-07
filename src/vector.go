@@ -24,6 +24,10 @@ func (a Vector) MulScal(m float32) Vector {
     return Vector{ a.X * m, a.Y * m, a.Z * m }
 }
 
+func (a Vector) AddScal(s float32) Vector {
+    return Vector{ a.X + s, a.Y + s, a.Z + s }
+}
+
 func (a Vector) Neg() Vector {
     return Vector{ -a.X, -a.Y, -a.Z }
 }

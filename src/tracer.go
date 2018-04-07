@@ -101,10 +101,8 @@ func TraceRay(config Config, scene Scene, ray Ray) color.Color {
         return color.RGBA{255, 0, 0, 255}
     }
 
-    v := Vector{255, 255, 255}.MulScal(
-        intersection.Normal.Dot(Vector{0, -1, 0.1}.Normalize()))
-    r := uint8(v.X * 255.)
-    g := uint8(v.Y * 255.)
-    b := uint8(v.Z * 255.)
-    return color.RGBA{r, g, b, 255}
+    out := Vector{1., 1., 1.}
+    light := Vector{0., -1., 0.02}.Normalize()
+
+    return VectorToRGBA(out.MulScal(Clamp(0, 1, intersection.Normal.Dot(light))))
 }
