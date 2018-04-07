@@ -1,40 +1,25 @@
 package main
 
 import (
-    "encoding/json";
-    "image";
-    "image/png";
-    "io/ioutil";
-    "os";
+    "encoding/json"
+    "fmt"
+    "image"
+    "image/png"
+    "io/ioutil"
+    "os"
+    "path"
+    "time"
 );
 
-type SceneObject struct {
-    ObjectID int
-    Position Vector
-    Rotation Vector
-    Scale Vector
-}
+func CreateDirectory(path string) bool {
+    if _, err := os.Stat(path); os.IsNotExist(err) {
+        err = os.MkdirAll(path, 0755)
+        if err != nil {
+            return false
+        }
+    }
 
-type Camera struct {
-    Position, Forward, Up Vector
-    Fov float32
-}
-
-type Scene struct {
-    Name string
-    OutputSize [2]int
-
-    Camera Camera
-    Models []string
-    Objects []Object
-    Scene []SceneObject
-
-}
-
-type Config struct {
-    MaxThreads int
-    BlockSize int
-    OutputPath string
+    return true
 }
 
 func LoadJSON(filename string, storage interface{}) {
@@ -70,12 +55,52 @@ func LoadConfig(filename string) Config {
     return out
 }
 
-func WriteImageToDisk(path string, buffer *image.RGBA) {
-    f, err := os.Create("/tmp/output.png");
+func GetFileHandleToDisk(config Config, prefix string, filename string) *os.File {
+    if !CreateDirectory(config.OutputDir) {
+        panic("unable to create output directory")
+    }
+
+    if config.ForceOutputName {
+        filename = path.Join(config.OutputDir, filename)
+    } else {
+        filename = prefix + time.Now().Format("2006-01-02--15-04-05") + ".json"
+        filename = path.Join(config.OutputDir, filename)
+    }
+
+    fmt.Printf("writting '%s'\n", filename)
+
+    f, err := os.Create(filename);
     if err != nil {
         panic(err)
     }
+
+    return f
+}
+
+func WriteReportToDisk(config Config, infos RenderInfo) {
+    if !config.SaveReport {
+        return
+    }
+
+    raw, err := json.MarshalIndent(infos, "", "    ")
+    if err != nil {
+        panic("unable to serialize rendering informations")
+    }
+
+    f := GetFileHandleToDisk(config, "report-", config.ReportName)
+    defer f.Close()
+
+    f.Write(raw)
+}
+
+func WriteImageToDisk(config Config, buffer *image.RGBA) {
+    if !config.SavePicture {
+        return
+    }
+
+    f := GetFileHandleToDisk(config, "output-", config.PictureName)
     defer f.Close()
 
     png.Encode(f, buffer);
 }
+
