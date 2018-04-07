@@ -43,7 +43,7 @@ func LoadScene(filename string) Scene {
     LoadJSON(filename, &out)
 
     for _,m := range out.Models {
-        out.Objects = append(out.Objects, CreateObjectFromOBJ(m))
+        out.Objects = append(out.Objects, ObjectCreateFromOBJ(m))
     }
 
     return out

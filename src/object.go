@@ -21,7 +21,7 @@ type Object struct {
     Triangles []Triangle
 }
 
-func CreateObjectFromOBJ(filename string) (o Object) {
+func ObjectCreateFromOBJ(filename string) (o Object) {
     f, err := os.Open(filename)
     if err != nil {
         panic(err)
