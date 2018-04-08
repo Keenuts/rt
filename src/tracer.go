@@ -10,9 +10,6 @@ type Intersection struct {
 }
 
 func IntersectPlane(r Ray, a, normal Vector) (bool, Intersection) {
-
-    r.Direction = r.Direction.Normalize()
-
     d := normal.Dot(r.Direction)
 
     if math.Abs(float64(d)) < EPSYLON {
@@ -29,6 +26,32 @@ func IntersectPlane(r Ray, a, normal Vector) (bool, Intersection) {
             normal,
         }
 
+}
+
+func IntersectSphere(r Ray, o Vector, rad float32) bool {
+    e0 := o.Sub(r.Origin)
+
+    v := e0.Dot(r.Direction)
+    d2 := e0.Dot(e0) - v * v
+    rad2 := rad * rad
+
+    if d2 > rad2 {
+        return false
+    }
+
+    d := float32(math.Sqrt(float64(rad2 - d2)))
+    t0 := v - d
+    t1 := v + d
+
+    if t0 > t1 {
+        t1, t0 = t0, t1
+    }
+
+    if t0 < 0 {
+        return t1 > 0
+    }
+
+    return t0 > 0
 }
 
 func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
@@ -67,6 +90,10 @@ func Intersect(obj Object, ray Ray) (bool, Intersection) {
     depth := float32(math.Inf(1))
     var intersection Intersection
 
+    if !IntersectSphere(ray, obj.Center, obj.BoundsRadius) {
+        return false, intersection
+    }
+
     for _, tri := range obj.Triangles {
         hit, info := IntersectTri(ray, tri)
 
@@ -86,6 +113,7 @@ func TraceRay(config Config, scene Scene, ray Ray) color.Color {
     depth := float32(math.Inf(1));
     var intersection Intersection
 
+    ray.Direction = ray.Direction.Normalize()
     for _, obj := range scene.Objects {
         hit, info := Intersect(obj, ray)
 

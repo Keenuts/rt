@@ -56,3 +56,11 @@ func (a Vector) Cross(b Vector) Vector {
 func (a Vector) Dot(b Vector) float32 {
     return a.X * b.X + a.Y * b.Y + a.Z * b.Z
 }
+
+func MinVec(a, b Vector) Vector {
+    return Vector{Min(a.X, b.X), Min(a.Y, b.Y), Min(a.Z, b.Z)}
+}
+
+func MaxVec(a, b Vector) Vector {
+    return Vector{Max(a.X, b.X), Max(a.Y, b.Y), Max(a.Z, b.Z)}
+}

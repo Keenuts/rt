@@ -18,7 +18,9 @@ type Triangle struct {
 type Object struct {
     Name string
     Center Vector
-    Bounds Box
+    BoundsRadius float32
+    BoundingBox Box
+
     Triangles []Triangle
 
     Vertex []Vector
@@ -59,6 +61,7 @@ func ObjectCreateFromOBJ(filename string) (o Object) {
     }
 
     o.Center = ObjectFindCenter(o)
+    o = ObjectCreateBounds(o)
     return
 }
 
@@ -72,4 +75,18 @@ func ObjectFindCenter(o Object) Vector {
     }
 
     return sum.MulScal(1. / count)
+}
+
+func ObjectCreateBounds(o Object) Object {
+    var min = Vector{0, 0, 0}
+    var max = Vector{0, 0, 0}
+
+    for _, vtx := range o.Vertex {
+        min = MinVec(min, vtx)
+        max = MaxVec(max, vtx)
+    }
+
+    o.BoundingBox = Box{ min, max }
+    o.BoundsRadius = Max(min.Magnitude(), max.Magnitude())
+    return o
 }
