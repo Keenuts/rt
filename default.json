@@ -3,21 +3,22 @@
     "OutputSize": [ 512, 512 ],
 
     "Camera": {
-            "position": { "x":0, "y":0, "z":-10 },
+            "position": { "x":0, "y":0, "z":-15 },
             "forward": { "x":0, "y":0, "z":1 },
             "up": { "x":0, "y":1, "z":0 },
             "fov": 45.0
     },
 
     "Meshs": [
+            "models/teapot-simplified.obj",
             "models/teapot.obj",
             "models/bunny-simplified.obj"
     ],
 
     "SceneObjects": [
         {
-            "objectId": 0,
-            "position": { "x":0, "y":0, "z":0 },
+            "objectId": 1,
+            "position": { "x":0, "y":-1, "z":0 },
             "rotation": { "x":0, "y":0, "z":0 },
             "scale":    { "x":1, "y":1, "z":1 }
         }
