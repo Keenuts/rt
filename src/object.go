@@ -87,6 +87,6 @@ func ObjectCreateBounds(o Object) Object {
     }
 
     o.BoundingBox = Box{ min, max }
-    o.BoundsRadius = Max(min.Magnitude(), max.Magnitude())
+    o.BoundsRadius = Max(Max(max.X - min.X, max.Y - min.Y), max.Z - min.Z) * .5
     return o
 }
