@@ -14,7 +14,7 @@ func CreateObject(desc SceneObject, model Model) (out Object) {
 
     out.Center = MeshFindCenter(out.Triangles)
     out.BoundingBox, out.BoundingSphere = MeshFindBounds(out.Triangles)
-    out.Tree = out.Tree.Insert(out.Triangles)
+    out.Tree = TreeCreate(out.Triangles)
 
     return
 }

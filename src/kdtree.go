@@ -1,33 +1,51 @@
 package main
 
-func (tree KDTree) Insert(triangles []Triangle) KDTree {
-    if tree.Left != nil || tree.Right != nil {
-        panic("Called insert twice on the same node")
-    }
+func TreeCreate(triangles []Triangle) (root KDTree) {
 
-    bounds, _ := MeshFindBounds(triangles)
-    max := bounds.Max.Sub(bounds.Min)
+    root.Triangles = triangles
+    queue := []*KDTree { &root }
 
-    tree.BoundingBox = bounds
+    for len(queue) > 0 {
+        node := queue[0]
+        queue = queue[1:]
 
-    if len(triangles) <= MIN_KDTREE_BUCKET {
-        tree.Triangles = triangles
-    } else {
+        bounds, _ := MeshFindBounds(node.Triangles)
+        max := bounds.Max.Sub(bounds.Min)
+        node.BoundingBox = bounds
+
+        if len(node.Triangles) <= MIN_KDTREE_BUCKET {
+            continue
+        }
+
+        var lbucket, rbucket []Triangle
         if max.X >= max.Y && max.X >= max.Z {
-            tree = tree.TreeInsertAxis(0, triangles)
+            lbucket, rbucket = TreeCreateBuckets(0, node.Triangles)
         } else if max.Y >= max.X && max.Y >= max.Z {
-            tree = tree.TreeInsertAxis(1, triangles)
+            lbucket, rbucket = TreeCreateBuckets(1, node.Triangles)
         } else {
-            tree = tree.TreeInsertAxis(2, triangles)
+            lbucket, rbucket = TreeCreateBuckets(2, node.Triangles)
+        }
+
+        node.Triangles = make([]Triangle, 0)
+        var lchild, rchild KDTree
+
+        if len(lbucket) > 0 {
+            lchild.Triangles = lbucket
+            node.Left = &lchild
+            queue = append(queue, &lchild)
+        }
+
+        if len(rbucket) > 0 {
+            rchild.Triangles = rbucket
+            node.Right = &rchild
+            queue = append(queue, &rchild)
         }
     }
 
-    return tree
+    return
 }
 
-func (tree KDTree) TreeInsertAxis(axis int, triangles []Triangle) KDTree {
-    var left, right []Triangle
-
+func TreeCreateBuckets(axis int, triangles []Triangle) (left, right []Triangle) {
     middleV := MeshFindCenter(triangles)
     middle := [3]float32 { middleV.X, middleV.Y, middleV.Z }
 
@@ -42,15 +60,5 @@ func (tree KDTree) TreeInsertAxis(axis int, triangles []Triangle) KDTree {
         }
     }
 
-    if len(left) > 0 {
-        tree.Left = new(KDTree)
-        *tree.Left = tree.Left.Insert(left)
-    }
-
-    if len(right) > 0 {
-        tree.Right = new(KDTree)
-        *tree.Right = tree.Right.Insert(right)
-    }
-
-    return tree
+    return
 }
