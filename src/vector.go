@@ -2,12 +2,6 @@ package main
 
 import "math"
 
-const EPSYLON = 1e-5
-
-type Vector struct {
-    X, Y, Z float32
-}
-
 func VecFromInt(x, y, z int) Vector {
     return Vector{float32(x), float32(y), float32(z)}
 }

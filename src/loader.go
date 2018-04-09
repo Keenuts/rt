@@ -11,6 +11,16 @@ import (
     "time"
 );
 
+type SceneFile struct {
+    Name string
+    OutputSize [2]int
+
+    Camera Camera
+    Models []string
+    Objects []Object
+    SceneObjects []SceneObject
+}
+
 func CreateDirectory(path string) bool {
     if _, err := os.Stat(path); os.IsNotExist(err) {
         err = os.MkdirAll(path, 0755)
@@ -29,8 +39,8 @@ func LoadJSON(filename string, storage interface{}) {
     }
 
     switch (storage).(type) {
-        case *Scene:
-            err = json.Unmarshal(content, storage.(*Scene))
+        case *SceneFile:
+            err = json.Unmarshal(content, storage.(*SceneFile))
         case *Config:
             err = json.Unmarshal(content, storage.(*Config))
         default:
@@ -38,15 +48,28 @@ func LoadJSON(filename string, storage interface{}) {
     }
 }
 
+func SceneFileToScene(file SceneFile) (out Scene) {
+    out.Name = file.Name
+    out.OutputSize = file.OutputSize
+    out.Camera = file.Camera
+
+    for _, obj := range file.SceneObjects {
+        o := file.Objects[obj.ObjectID]
+        out.Objects = append(out.Objects, o)
+    }
+
+    return
+}
+
 func LoadScene(filename string) Scene {
-    var out Scene
+    var out SceneFile
     LoadJSON(filename, &out)
 
     for _,m := range out.Models {
         out.Objects = append(out.Objects, ObjectCreateFromOBJ(m))
     }
 
-    return out
+    return SceneFileToScene(out)
 }
 
 func LoadConfig(filename string) Config {

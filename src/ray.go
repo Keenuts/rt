@@ -4,12 +4,6 @@ import (
     "math"
 );
 
-const DEG2RAD = ((math.Pi * 2.) / 360.)
-
-type Ray struct {
-    Origin, Direction Vector
-}
-
 func ScreenPointToRay(scene Scene, x, y int) Ray {
     var r Ray
 

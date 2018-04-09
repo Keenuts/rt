@@ -5,10 +5,6 @@ import (
     "math"
 );
 
-type Intersection struct {
-    Position, Normal Vector
-}
-
 func IntersectSphere(r Ray, s Sphere) bool {
     e0 := s.Center.Sub(r.Origin)
 

@@ -6,32 +6,6 @@ import (
     "os"
 );
 
-// Bounding box not used for now
-type Box struct {
-    Min, Max Vector
-    Volume float32
-}
-
-type Sphere struct {
-    Center Vector
-    Radius, Volume float32
-}
-
-type Triangle struct {
-    A, B, C Vector
-}
-
-type Object struct {
-    Name string
-    Center Vector
-
-    BoundingSphere Sphere
-    BoundingBox Box
-
-    Triangles []Triangle
-    Vertex []Vector
-}
-
 func ObjectCreateFromOBJ(filename string) (o Object) {
     f, err := os.Open(filename)
     if err != nil {
