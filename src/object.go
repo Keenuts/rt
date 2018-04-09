@@ -51,10 +51,10 @@ func ObjectCreateFromOBJ(filename string) (o Object) {
         panic("Invalid mesh. Indices count not a multiple of 3.")
     }
 
-    for i := 0; i < len(obj.Coord); i += 8 {
-        o.Vertex = append(o.Vertex, Vector{ obj.Coord[i + 0],
-                                            obj.Coord[i + 1],
-                                            obj.Coord[i + 2]})
+    vcount := obj.NumberOfElements()
+    for i := 0; i < vcount; i++ {
+        x, y, z := obj.VertexCoordinates(i)
+        o.Vertex = append(o.Vertex, Vector{ x, y, z })
     }
 
     for i := 0; i < len(obj.Indices); i += 3 {
