@@ -16,8 +16,8 @@ type SceneFile struct {
     OutputSize [2]int
 
     Camera Camera
-    Models []string
-    Objects []Object
+    Meshs []string
+
     SceneObjects []SceneObject
 }
 
@@ -48,28 +48,33 @@ func LoadJSON(filename string, storage interface{}) {
     }
 }
 
-func SceneFileToScene(file SceneFile) (out Scene) {
+func SceneFileToScene(file SceneFile, models []Model) (out Scene) {
     out.Name = file.Name
     out.OutputSize = file.OutputSize
     out.Camera = file.Camera
 
-    for _, obj := range file.SceneObjects {
-        o := file.Objects[obj.ObjectID]
-        out.Objects = append(out.Objects, o)
+    for _, desc := range file.SceneObjects {
+        if desc.ObjectID >= len(models) {
+            panic("Invalid object ID")
+        }
+
+        dst := CreateObject(desc, models[desc.ObjectID])
+        out.Objects = append(out.Objects, dst)
     }
 
     return
 }
 
 func LoadScene(filename string) Scene {
-    var out SceneFile
-    LoadJSON(filename, &out)
+    var file SceneFile
+    LoadJSON(filename, &file)
 
-    for _,m := range out.Models {
-        out.Objects = append(out.Objects, ObjectCreateFromOBJ(m))
+    var models []Model
+    for _,path := range file.Meshs {
+        models = append(models, ModelFromOBJ(path))
     }
 
-    return SceneFileToScene(out)
+    return SceneFileToScene(file, models)
 }
 
 func LoadConfig(filename string) Config {

@@ -1,20 +1,20 @@
 {
-    "name": "default-scene",
-    "outputSize": [ 512, 512 ],
+    "Name": "default-scene",
+    "OutputSize": [ 512, 512 ],
 
-    "camera": {
+    "Camera": {
             "position": { "x":0, "y":0, "z":-10 },
             "forward": { "x":0, "y":0, "z":1 },
             "up": { "x":0, "y":1, "z":0 },
             "fov": 45.0
     },
 
-    "models": [
+    "Meshs": [
             "models/teapot.obj",
             "models/bunny-simplified.obj"
     ],
 
-    "sceneObjects": [
+    "SceneObjects": [
         {
             "objectId": 0,
             "position": { "x":0, "y":0, "z":0 },

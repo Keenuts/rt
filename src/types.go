@@ -64,17 +64,23 @@ type Triangle struct {
     A, B, C Vector
 }
 
+type Model struct {
+    Name string
+    Triangles []Triangle
+    Vertex []Vector
+}
+
 type Object struct {
     Name string
-    Position, Rotation, Scale Vector
-    Center Vector
 
+    Center Vector
     BoundingSphere Sphere
     BoundingBox Box
 
     Triangles []Triangle
     Vertex []Vector
 }
+
 
 // Tracing
 

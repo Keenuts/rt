@@ -1,47 +1,19 @@
 package main
 
-import (
-    "bufio"
-    "github.com/udhos/gwob"
-    "os"
-);
+import "fmt"
 
-func ObjectCreateFromOBJ(filename string) (o Object) {
-    f, err := os.Open(filename)
-    if err != nil {
-        panic(err)
-    }
-    defer f.Close()
+func CreateObject(desc SceneObject, model Model) (out Object) {
+    fmt.Println("Loading ", model.Name)
 
-    reader := bufio.NewReader(f)
-    options := gwob.ObjParserOptions{}
+    out.Name = model.Name
 
-    obj, err := gwob.NewObjFromReader("FIXME", reader, &options)
-    if err != nil {
-        panic(err)
-    }
+    out.Triangles = make([]Triangle, len(model.Triangles))
+    copy(out.Triangles, model.Triangles)
+    out.Vertex = make([]Vector, len(model.Vertex))
+    copy(out.Vertex, model.Vertex)
 
-    if len(obj.Indices) % 3 != 0 {
-        panic("Invalid mesh. Indices count not a multiple of 3.")
-    }
-
-    vcount := obj.NumberOfElements()
-    for i := 0; i < vcount; i++ {
-        x, y, z := obj.VertexCoordinates(i)
-        o.Vertex = append(o.Vertex, Vector{ x, y, z })
-    }
-
-    for i := 0; i < len(obj.Indices); i += 3 {
-        t := Triangle {
-            o.Vertex[obj.Indices[i + 0]],
-            o.Vertex[obj.Indices[i + 1]],
-            o.Vertex[obj.Indices[i + 2]],
-        }
-        o.Triangles = append(o.Triangles, t)
-    }
-
-    o.Center = ObjectFindCenter(o)
-    o = ObjectCreateBounds(o)
+    out.Center = ObjectFindCenter(out)
+    out.BoundingBox, out.BoundingSphere = ObjectFindBounds(out)
 
     return
 }
@@ -58,7 +30,7 @@ func ObjectFindCenter(o Object) Vector {
     return sum.MulScal(1. / count)
 }
 
-func ObjectCreateBounds(o Object) Object {
+func ObjectFindBounds(o Object) (box Box, sphere Sphere) {
     var min = Vector{0, 0, 0}
     var max = Vector{0, 0, 0}
 
@@ -67,11 +39,11 @@ func ObjectCreateBounds(o Object) Object {
         max = MaxVec(max, vtx)
     }
 
-    o.BoundingBox = Box{ min, max, BoxVolume(min, max) }
+    box = Box{ min, max, BoxVolume(min, max) }
 
-    o.BoundingSphere.Center = max.Sub(min).MulScal(.5).Add(min)
-    o.BoundingSphere.Radius = Max(Max(max.X - min.X, max.Y - min.Y), max.Z - min.Z) * .5
-    o.BoundingSphere.Volume = SphereVolume(o.BoundingSphere.Radius)
+    sphere.Center = max.Sub(min).MulScal(.5).Add(min)
+    sphere.Radius = Max(Max(max.X - min.X, max.Y - min.Y), max.Z - min.Z) * .5
+    sphere.Volume = SphereVolume(o.BoundingSphere.Radius)
 
-    return o
+    return
 }

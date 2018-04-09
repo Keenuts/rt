@@ -1,6 +1,6 @@
 {
     "maxThreads": 4,
-    "blockSize": 2,
+    "blockSize": 16,
     "outputDir": "/tmp/rendering/",
     "savePicture": false,
     "saveReport": false,
