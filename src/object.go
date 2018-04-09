@@ -9,8 +9,8 @@ func CreateObject(desc SceneObject, model Model) (out Object) {
 
     out.Triangles = make([]Triangle, len(model.Triangles))
     copy(out.Triangles, model.Triangles)
-    out.Vertex = make([]Vector, len(model.Vertex))
-    copy(out.Vertex, model.Vertex)
+
+    ObjectTransform(out, desc)
 
     out.Center = ObjectFindCenter(out)
     out.BoundingBox, out.BoundingSphere = ObjectFindBounds(out)
@@ -18,13 +18,24 @@ func CreateObject(desc SceneObject, model Model) (out Object) {
     return
 }
 
+func ObjectTransform(obj Object, desc SceneObject) {
+
+    for i, tri := range obj.Triangles {
+        tri.A = tri.A.Scale(desc.Scale).RotateDeg(desc.Rotation).Add(desc.Position)
+        tri.B = tri.B.Scale(desc.Scale).RotateDeg(desc.Rotation).Add(desc.Position)
+        tri.C = tri.C.Scale(desc.Scale).RotateDeg(desc.Rotation).Add(desc.Position)
+
+        obj.Triangles[i] = tri
+    }
+}
+
 func ObjectFindCenter(o Object) Vector {
     var sum Vector
     var count float32
 
-    for _, vtx := range o.Vertex {
-        sum = sum.Add(vtx)
-        count += 1.
+    for _, tri := range o.Triangles {
+        sum = sum.Add(tri.A).Add(tri.B).Add(tri.C)
+        count += 3.
     }
 
     return sum.MulScal(1. / count)
@@ -34,9 +45,9 @@ func ObjectFindBounds(o Object) (box Box, sphere Sphere) {
     var min = Vector{0, 0, 0}
     var max = Vector{0, 0, 0}
 
-    for _, vtx := range o.Vertex {
-        min = MinVec(min, vtx)
-        max = MaxVec(max, vtx)
+    for _, tri := range o.Triangles {
+        min = MinVec(MinVec(MinVec(min, tri.A), tri.B), tri.C)
+        max = MaxVec(MaxVec(MaxVec(max, tri.A), tri.B), tri.C)
     }
 
     box = Box{ min, max, BoxVolume(min, max) }

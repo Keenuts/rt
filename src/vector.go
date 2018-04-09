@@ -14,6 +14,22 @@ func (a Vector) Sub(b Vector) Vector {
     return Vector{ a.X - b.X, a.Y - b.Y, a.Z - b.Z }
 }
 
+func (a Vector) Scale(b Vector) Vector {
+    return Vector{ a.X * b.X, a.Y * b.Y, a.Z * b.Z }
+}
+
+func (a Vector) RotateDeg(b Vector) Vector {
+    return a.RotateRad(b.MulScal(DEG2RAD))
+}
+
+func (a Vector) RotateRad(b Vector) Vector {
+    mX := MatrixCreateRotateX(b.X)
+    mY := MatrixCreateRotateY(b.Y)
+    mZ := MatrixCreateRotateZ(b.Z)
+
+    return mZ.Mul(mY.Mul(mX.Mul(a)))
+}
+
 func (a Vector) MulScal(m float32) Vector {
     return Vector{ a.X * m, a.Y * m, a.Z * m }
 }

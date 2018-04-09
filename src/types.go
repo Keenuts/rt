@@ -6,6 +6,8 @@ type Vector struct {
     X, Y, Z float32
 }
 
+type Mat3 [3][3]float32
+
 // Scene related
 
 type RenderInfo struct {
@@ -78,7 +80,6 @@ type Object struct {
     BoundingBox Box
 
     Triangles []Triangle
-    Vertex []Vector
 }
 
 
