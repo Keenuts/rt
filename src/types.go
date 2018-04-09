@@ -80,6 +80,7 @@ type Object struct {
     BoundingBox Box
 
     Triangles []Triangle
+    Tree KDTree
 }
 
 
@@ -93,4 +94,9 @@ type Ray struct {
     Origin, Direction Vector
 }
 
+type KDTree struct {
+    Left, Right *KDTree
 
+    BoundingBox Box
+    Triangles []Triangle
+}

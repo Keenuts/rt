@@ -144,8 +144,39 @@ func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
     return true, info
 }
 
-func Intersect(obj Object, ray Ray) (bool, Intersection) {
+func IntersectKDTree(ray Ray, tree *KDTree) (bool, Intersection) {
+    var out Intersection
+    var touch bool
+
+    if !IntersectBox(ray, tree.BoundingBox) {
+        return false, out
+    }
+
+    if tree.Left != nil || tree.Right != nil {
+        touch, out = IntersectKDTree(ray, tree.Left)
+        if touch {
+            return touch, out
+        }
+        return IntersectKDTree(ray, tree.Right)
+    }
+
     depth := float32(math.Inf(1))
+
+    for _, tri := range tree.Triangles {
+        hit, info := IntersectTri(ray, tri)
+
+        dist := info.Position.Sub(ray.Origin).Magnitude()
+
+        if hit && dist < depth {
+            out = info
+            depth = dist
+        }
+    }
+
+    return !math.IsInf(float64(depth), 1), out
+}
+
+func Intersect(ray Ray, obj Object) (bool, Intersection) {
     var intersection Intersection
 
     if !IntersectSphere(ray, obj.BoundingSphere) {
@@ -156,18 +187,7 @@ func Intersect(obj Object, ray Ray) (bool, Intersection) {
         return false, intersection
     }
 
-    for _, tri := range obj.Triangles {
-        hit, info := IntersectTri(ray, tri)
-
-        dist := info.Position.Sub(ray.Origin).Magnitude()
-
-        if hit && dist < depth {
-            intersection = info
-            depth = dist
-        }
-    }
-
-    return !math.IsInf(float64(depth), 1), intersection
+    return IntersectKDTree(ray, &obj.Tree)
 }
 
 func TraceRay(config Config, scene Scene, ray Ray) color.Color {
@@ -177,7 +197,7 @@ func TraceRay(config Config, scene Scene, ray Ray) color.Color {
 
     ray.Direction = ray.Direction.Normalize()
     for _, obj := range scene.Objects {
-        hit, info := Intersect(obj, ray)
+        hit, info := Intersect(ray, obj)
 
         if !hit {
             continue
