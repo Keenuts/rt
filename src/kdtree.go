@@ -10,7 +10,7 @@ func (tree KDTree) Insert(triangles []Triangle) KDTree {
 
     tree.BoundingBox = bounds
 
-    if len(triangles) < 16 {
+    if len(triangles) <= MIN_KDTREE_BUCKET {
         tree.Triangles = triangles
     } else {
         if max.X >= max.Y && max.X >= max.Z {
