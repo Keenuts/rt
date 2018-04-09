@@ -1,9 +1,13 @@
 package main
 
+import "math"
+
 func TreeCreate(triangles []Triangle) (root KDTree) {
 
     root.Triangles = triangles
     queue := []*KDTree { &root }
+    maxBuilt := uint64(math.Pow(2, KDTREE_DEPTH_HINT)) - 1
+    built := uint64(0);
 
     for len(queue) > 0 {
         node := queue[0]
@@ -12,8 +16,11 @@ func TreeCreate(triangles []Triangle) (root KDTree) {
         bounds, _ := MeshFindBounds(node.Triangles)
         max := bounds.Max.Sub(bounds.Min)
         node.BoundingBox = bounds
+        built += 1
 
-        if len(node.Triangles) <= MIN_KDTREE_BUCKET {
+        if built > maxBuilt || len(node.Triangles) <= KDTREE_BUCKET_SIZE_HINT {
+            node.Left = nil
+            node.Right = nil
             continue
         }
 
@@ -26,7 +33,6 @@ func TreeCreate(triangles []Triangle) (root KDTree) {
             lbucket, rbucket = TreeCreateBuckets(2, node.Triangles)
         }
 
-        node.Triangles = make([]Triangle, 0)
         var lchild, rchild KDTree
 
         if len(lbucket) > 0 {
@@ -40,6 +46,8 @@ func TreeCreate(triangles []Triangle) (root KDTree) {
             node.Right = &rchild
             queue = append(queue, &rchild)
         }
+
+        node.Triangles = make([]Triangle, 0)
     }
 
     return
