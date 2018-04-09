@@ -153,11 +153,16 @@ func IntersectKDTree(ray Ray, tree *KDTree) (bool, Intersection) {
     }
 
     if tree.Left != nil || tree.Right != nil {
-        touch, out = IntersectKDTree(ray, tree.Left)
-        if touch {
-            return touch, out
+        if tree.Left != nil {
+            touch, out = IntersectKDTree(ray, tree.Left)
+            if touch {
+                return touch, out
+            }
         }
-        return IntersectKDTree(ray, tree.Right)
+
+        if tree.Right != nil {
+            return IntersectKDTree(ray, tree.Right)
+        }
     }
 
     depth := float32(math.Inf(1))
