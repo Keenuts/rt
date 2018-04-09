@@ -9,31 +9,12 @@ type Intersection struct {
     Position, Normal Vector
 }
 
-func IntersectPlane(r Ray, a, normal Vector) (bool, Intersection) {
-    d := normal.Dot(r.Direction)
-
-    if math.Abs(float64(d)) < EPSYLON {
-        return false, Intersection{}
-    }
-
-    t := a.Sub(r.Origin).Dot(normal) / d
-    if t < 0. {
-        return false, Intersection{}
-    }
-
-    return true, Intersection{
-            r.Origin.Add(r.Direction.MulScal(t)),
-            normal,
-        }
-
-}
-
-func IntersectSphere(r Ray, o Vector, rad float32) bool {
-    e0 := o.Sub(r.Origin)
+func IntersectSphere(r Ray, s Sphere) bool {
+    e0 := s.Center.Sub(r.Origin)
 
     v := e0.Dot(r.Direction)
     d2 := e0.Dot(e0) - v * v
-    rad2 := rad * rad
+    rad2 := s.Radius * s.Radius
 
     if d2 > rad2 {
         return false
@@ -52,6 +33,87 @@ func IntersectSphere(r Ray, o Vector, rad float32) bool {
     }
 
     return t0 > 0
+}
+
+// Returns true if inside, and closest coord to space between min and max
+func GetClosestBound(p, min, max float32) (float32, bool) {
+    if p < min {
+        return min, false
+    }
+    if p > max {
+        return max, false
+    }
+    return p, true
+}
+
+func IntersectBox(r Ray, b Box) bool {
+    ori := []float32 { r.Origin.X, r.Origin.Y, r.Origin.Z }
+    dir := []float32 { r.Direction.X, r.Direction.Y, r.Direction.Z }
+    min := []float32 { b.Min.X, b.Min.Y, b.Min.Z }
+    max := []float32 { b.Max.X, b.Max.Y, b.Max.Z }
+
+    var steps [3][3]float32
+    var inside [3]bool
+
+    for i := 0; i < 3; i++ {
+        steps[0][i], inside[i] = GetClosestBound(ori[i], min[i], max[i])
+    }
+
+    if inside[0] && inside[1] && inside[2] {
+        return true
+    }
+
+    for i := 0; i < 3; i++ {
+        if !inside[i] && !IsZero(dir[i]) {
+            steps[1][i] = (steps[0][i] - ori[i]) / dir[i]
+        } else {
+            steps[1][i] = -1
+        }
+    }
+
+    t_lim := 0
+    for i := 1; i < 3; i++ {
+        if steps[1][t_lim] < steps[1][i] {
+            t_lim = i
+        }
+    }
+
+    if steps[1][t_lim] < 0 {
+        return false
+    }
+
+    for i := 0; i < 3; i++ {
+        if i == t_lim {
+            steps[2][i] = steps[1][i]
+        } else {
+            steps[2][i] = ori[i] + dir[i] * steps[1][t_lim]
+            if steps[2][i] < min[i] || steps[2][i] > max[i] {
+                return false
+            }
+        }
+    }
+
+    return true
+}
+
+func IntersectPlane(r Ray, a, normal Vector) (bool, Intersection) {
+    d := normal.Dot(r.Direction)
+
+    // Normal and ray are perpendicular
+    if math.Abs(float64(d)) < EPSYLON {
+        return false, Intersection{}
+    }
+
+    t := a.Sub(r.Origin).Dot(normal) / d
+    if t < 0. {
+        return false, Intersection{}
+    }
+
+    return true, Intersection{
+            r.Origin.Add(r.Direction.MulScal(t)),
+            normal,
+        }
+
 }
 
 func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
@@ -90,7 +152,11 @@ func Intersect(obj Object, ray Ray) (bool, Intersection) {
     depth := float32(math.Inf(1))
     var intersection Intersection
 
-    if !IntersectSphere(ray, obj.Center, obj.BoundsRadius) {
+    if !IntersectSphere(ray, obj.BoundingSphere) {
+        return false, intersection
+    }
+
+    if !IntersectBox(ray, obj.BoundingBox) {
         return false, intersection
     }
 

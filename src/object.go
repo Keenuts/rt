@@ -9,6 +9,12 @@ import (
 // Bounding box not used for now
 type Box struct {
     Min, Max Vector
+    Volume float32
+}
+
+type Sphere struct {
+    Center Vector
+    Radius, Volume float32
 }
 
 type Triangle struct {
@@ -18,11 +24,11 @@ type Triangle struct {
 type Object struct {
     Name string
     Center Vector
-    BoundsRadius float32
+
+    BoundingSphere Sphere
     BoundingBox Box
 
     Triangles []Triangle
-
     Vertex []Vector
 }
 
@@ -62,6 +68,7 @@ func ObjectCreateFromOBJ(filename string) (o Object) {
 
     o.Center = ObjectFindCenter(o)
     o = ObjectCreateBounds(o)
+
     return
 }
 
@@ -86,7 +93,11 @@ func ObjectCreateBounds(o Object) Object {
         max = MaxVec(max, vtx)
     }
 
-    o.BoundingBox = Box{ min, max }
-    o.BoundsRadius = Max(Max(max.X - min.X, max.Y - min.Y), max.Z - min.Z) * .5
+    o.BoundingBox = Box{ min, max, BoxVolume(min, max) }
+
+    o.BoundingSphere.Center = max.Sub(min).MulScal(.5).Add(min)
+    o.BoundingSphere.Radius = Max(Max(max.X - min.X, max.Y - min.Y), max.Z - min.Z) * .5
+    o.BoundingSphere.Volume = SphereVolume(o.BoundingSphere.Radius)
+
     return o
 }
