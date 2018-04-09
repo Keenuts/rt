@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func CreateObject(desc SceneObject, model Model) (out Object) {
-    fmt.Println("Loading ", model.Name)
+    fmt.Printf("preprocessing %s...", model.Name)
 
     out.Name = model.Name
 
@@ -16,6 +16,7 @@ func CreateObject(desc SceneObject, model Model) (out Object) {
     out.BoundingBox, out.BoundingSphere = MeshFindBounds(out.Triangles)
     out.Tree = TreeCreate(out.Triangles)
 
+    fmt.Printf("done\n")
     return
 }
 

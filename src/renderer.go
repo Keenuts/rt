@@ -43,6 +43,7 @@ func CreateRenderTasks(config Config, scene Scene) (taskList []Task) {
 }
 
 func RenderWeldBlocks(scene Scene, blockList []Task) *image.RGBA {
+    fmt.Printf("welding blocks...\r")
     rect := image.Rect(0, 0, scene.OutputSize[0], scene.OutputSize[1])
     output := image.NewRGBA(rect)
 
@@ -50,6 +51,7 @@ func RenderWeldBlocks(scene Scene, blockList []Task) *image.RGBA {
         draw.Draw(output, elt.Area, elt.Buffer, image.ZP, draw.Src)
     }
 
+    fmt.Printf("welding blocks...done\n")
     return output
 }
 
@@ -84,7 +86,6 @@ func RenderScene(config Config, scene Scene) (output *image.RGBA) {
                 mux.Lock()
                 blockList = append(blockList, t)
 
-                //fmt.Printf("done: %d/%d\r", len(blockList), blockCount)
                 mux.Unlock()
             }
         }()
@@ -94,14 +95,13 @@ func RenderScene(config Config, scene Scene) (output *image.RGBA) {
         defer wg.Done()
 
         for len(blockList) < blockCount {
-            fmt.Printf("done: %d/%d\r", len(blockList), blockCount)
+            fmt.Printf("rendering... %d/%d\r", len(blockList), blockCount)
             time.Sleep(2e8)
         }
-        fmt.Printf("done: %d/%d\n", blockCount, blockCount)
+        fmt.Printf("rendering...done          \n")
     }()
 
     wg.Wait()
 
-    fmt.Printf("\noutputing now.\n")
     return RenderWeldBlocks(scene, blockList)
 }

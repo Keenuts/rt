@@ -96,7 +96,6 @@ func GetFileHandleToDisk(config Config, prefix string, ext string, alt string) *
         filename = path.Join(config.OutputDir, filename)
     }
 
-    fmt.Printf("writting '%s'\n", filename)
 
     f, err := os.Create(filename);
     if err != nil {
@@ -119,7 +118,9 @@ func WriteReportToDisk(config Config, infos RenderInfo) {
     f := GetFileHandleToDisk(config, "report-", ".json", config.ReportName)
     defer f.Close()
 
+    fmt.Printf("writting report...\r")
     f.Write(raw)
+    fmt.Printf("writting report...done\n")
 }
 
 func WriteImageToDisk(config Config, buffer *image.RGBA) {
@@ -130,6 +131,8 @@ func WriteImageToDisk(config Config, buffer *image.RGBA) {
     f := GetFileHandleToDisk(config, "output-", ".png", config.PictureName)
     defer f.Close()
 
+    fmt.Printf("writting picture...\r")
     png.Encode(f, buffer);
+    fmt.Printf("writting picture...done\n")
 }
 
