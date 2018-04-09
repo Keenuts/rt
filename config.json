@@ -2,9 +2,9 @@
     "maxThreads": 4,
     "blockSize": 16,
     "outputDir": "/tmp/rendering/",
-    "savePicture": false,
-    "saveReport": false,
-    "forceOutputName": false,
+    "savePicture": true,
+    "saveReport": true,
+    "forceOutputName": true,
     "pictureName": "output.png",
     "reportName": "report.json"
 }
