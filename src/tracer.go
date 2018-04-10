@@ -5,7 +5,7 @@ import (
     "math"
 );
 
-func IntersectSphere(r Ray, s Sphere) bool {
+func RaycheckSphere(r Ray, s Sphere) bool {
     e0 := s.Center.Sub(r.Origin)
 
     v := e0.Dot(r.Direction)
@@ -42,7 +42,7 @@ func GetClosestBound(p, min, max float32) (float32, bool) {
     return p, true
 }
 
-func IntersectBox(r Ray, b Box) bool {
+func RaycheckBox(r Ray, b Box) bool {
     ori := []float32 { r.Origin.X, r.Origin.Y, r.Origin.Z }
     dir := []float32 { r.Direction.X, r.Direction.Y, r.Direction.Z }
     min := []float32 { b.Min.X, b.Min.Y, b.Min.Z }
@@ -150,7 +150,7 @@ func IntersectKDTree(ray Ray, tree *KDTree) (bool, Intersection) {
     var out Intersection
     var touch bool
 
-    if !IntersectBox(ray, tree.BoundingBox) {
+    if !RaycheckBox(ray, tree.BoundingBox) {
         return false, out
     }
 
@@ -186,11 +186,11 @@ func IntersectKDTree(ray Ray, tree *KDTree) (bool, Intersection) {
 func Intersect(ray Ray, obj Object) (bool, Intersection) {
     var intersection Intersection
 
-    if !IntersectSphere(ray, obj.BoundingSphere) {
+    if !RaycheckSphere(ray, obj.BoundingSphere) {
         return false, intersection
     }
 
-    if !IntersectBox(ray, obj.BoundingBox) {
+    if !RaycheckBox(ray, obj.BoundingBox) {
         return false, intersection
     }
 
