@@ -80,7 +80,7 @@ func MeshFindBounds(triangles []Triangle) (box Box, sphere Sphere) {
     box = Box{ min, max, BoxVolume(min, max) }
 
     sphere.Center = max.Sub(min).MulScal(.5).Add(min)
-    sphere.Radius = Max(Max(max.X - min.X, max.Y - min.Y), max.Z - min.Z) * .5
+    sphere.Radius = Max(min.Sub(sphere.Center).Magnitude(), max.Sub(sphere.Center).Magnitude())
     sphere.Volume = SphereVolume(sphere.Radius)
 
     return
