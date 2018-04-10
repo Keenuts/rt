@@ -7,8 +7,8 @@ import (
 func main() {
     var infos RenderInfo
 
-    scene := LoadScene("default.json")
     config := LoadConfig("config.json")
+    scene := LoadScene(config.SceneName)
 
     infos.Config = config
     infos.Date = time.Now().Format("2006-01-02--15-04-05")

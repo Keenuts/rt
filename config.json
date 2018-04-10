@@ -6,5 +6,6 @@
     "saveReport": true,
     "forceOutputName": true,
     "pictureName": "output.png",
-    "reportName": "report.json"
+    "reportName": "report.json",
+    "sceneName" : "scenes/teapot.json"
 }

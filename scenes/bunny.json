@@ -1,5 +1,5 @@
 {
-    "Name": "default-scene",
+    "Name": "bunny-scene",
     "OutputSize": [ 512, 512 ],
 
     "Camera": {
@@ -10,14 +10,12 @@
     },
 
     "Meshs": [
-            "models/teapot-simplified.obj",
-            "models/teapot.obj",
             "models/bunny-simplified.obj"
     ],
 
     "SceneObjects": [
         {
-            "objectId": 2,
+            "objectId": 0,
             "position": { "x":-0.02, "y":-0.1, "z":-9.5 },
             "rotation": { "x":0, "y":180, "z":0 },
             "scale":    { "x":1, "y":1, "z":1 }

@@ -1,3 +1,6 @@
 rt
 rendering-*.json
 reports
+models/dragon.obj
+models/lucy.obj
+models/suzanne.obj

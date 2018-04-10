@@ -48,6 +48,7 @@ type Config struct {
     ForceOutputName bool
     PictureName string
     ReportName string
+    SceneName string
 }
 
 // Objects related
