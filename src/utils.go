@@ -61,7 +61,7 @@ func MeshFindCenter(triangles []Triangle) Vector {
     divider := 1. / float32(len(triangles) * 3)
 
     for _, tri := range triangles {
-        v := tri.A.Add(tri.B).Add(tri.C)
+        v := tri.Vertex[0].Add(tri.Vertex[1]).Add(tri.Vertex[2])
         sum = sum.Add(v.MulScal(divider))
     }
 
@@ -73,8 +73,8 @@ func MeshFindBounds(triangles []Triangle) (box Box, sphere Sphere) {
     var max = Vector{0, 0, 0}
 
     for _, tri := range triangles {
-        min = MinVec(MinVec(MinVec(min, tri.A), tri.B), tri.C)
-        max = MaxVec(MaxVec(MaxVec(max, tri.A), tri.B), tri.C)
+        min = MinVec(MinVec(MinVec(min, tri.Vertex[0]), tri.Vertex[1]), tri.Vertex[2])
+        max = MaxVec(MaxVec(MaxVec(max, tri.Vertex[0]), tri.Vertex[1]), tri.Vertex[2])
     }
 
     box = Box{ min, max, BoxVolume(min, max) }
@@ -87,5 +87,5 @@ func MeshFindBounds(triangles []Triangle) (box Box, sphere Sphere) {
 }
 
 func TriangleFindCenter(t Triangle) Vector {
-    return t.A.Add(t.B.Add(t.C)).MulScal(1./3.)
+    return t.Vertex[0].Add(t.Vertex[1].Add(t.Vertex[2])).MulScal(1./3.)
 }

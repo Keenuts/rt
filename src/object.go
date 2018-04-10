@@ -23,9 +23,10 @@ func CreateObject(desc SceneObject, model Model) (out Object) {
 func ObjectTransform(obj Object, desc SceneObject) {
 
     for i, tri := range obj.Triangles {
-        tri.A = tri.A.Scale(desc.Scale).RotateDeg(desc.Rotation).Add(desc.Position)
-        tri.B = tri.B.Scale(desc.Scale).RotateDeg(desc.Rotation).Add(desc.Position)
-        tri.C = tri.C.Scale(desc.Scale).RotateDeg(desc.Rotation).Add(desc.Position)
+
+        for j := 0; j < 3; j++ {
+            tri.Vertex[j] = tri.Vertex[j].Scale(desc.Scale).RotateDeg(desc.Rotation).Add(desc.Position)
+        }
 
         obj.Triangles[i] = tri
     }

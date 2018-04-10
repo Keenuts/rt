@@ -113,30 +113,32 @@ func IntersectPlane(r Ray, a, normal Vector) (bool, Intersection) {
 }
 
 func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
-    ab := t.B.Sub(t.A).Normalize()
-    ac := t.C.Sub(t.A).Normalize()
+    ab := t.Vertex[1].Sub(t.Vertex[0]).Normalize()
+    ac := t.Vertex[2].Sub(t.Vertex[0]).Normalize()
+    bc := t.Vertex[2].Sub(t.Vertex[1]).Normalize()
+    ca := t.Vertex[0].Sub(t.Vertex[2]).Normalize()
     normal := ab.Cross(ac).Normalize()
 
     if normal.Dot(r.Direction) < 0 {
         return false, Intersection{}
     }
 
-    hit, info := IntersectPlane(r, t.A, normal)
+    hit, info := IntersectPlane(r, t.Vertex[0], normal)
     if !hit {
         return false, Intersection{}
     }
 
-    tmp := ab.Cross(info.Position.Sub(t.A))
+    tmp := ab.Cross(info.Position.Sub(t.Vertex[0]))
     if info.Normal.Dot(tmp) < 0 {
         return false, Intersection{}
     }
 
-    tmp = t.C.Sub(t.B).Cross(info.Position.Sub(t.B))
+    tmp = bc.Cross(info.Position.Sub(t.Vertex[1]))
     if normal.Dot(tmp) < 0 {
         return false, Intersection{}
     }
 
-    tmp = t.A.Sub(t.C).Cross(info.Position.Sub(t.C))
+    tmp = ca.Cross(info.Position.Sub(t.Vertex[2]))
     if info.Normal.Dot(tmp) < 0 {
         return false, Intersection{}
     }

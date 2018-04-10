@@ -32,11 +32,13 @@ func ModelFromOBJ(filename string) (model Model) {
     }
 
     for i := 0; i < len(obj.Indices); i += 3 {
-        t := Triangle {
+        vtx := [3]Vector {
             model.Vertex[obj.Indices[i + 0]],
             model.Vertex[obj.Indices[i + 1]],
             model.Vertex[obj.Indices[i + 2]],
         }
+
+        t := Triangle { vtx }
         model.Triangles = append(model.Triangles, t)
     }
 
