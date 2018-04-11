@@ -25,7 +25,11 @@ func ObjectTransform(obj Object, desc SceneObject) {
     for i, tri := range obj.Triangles {
 
         for j := 0; j < 3; j++ {
-            tri.Vertex[j] = tri.Vertex[j].Scale(desc.Scale).RotateDeg(desc.Rotation).Add(desc.Position)
+            v := tri.Vertex[j].Scale(desc.Scale)
+            v = v.RotateDeg(desc.Rotation)
+            v = v.Add(desc.Position)
+
+            tri.Vertex[j] = v
         }
 
         obj.Triangles[i] = tri
