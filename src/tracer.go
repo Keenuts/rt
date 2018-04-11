@@ -31,71 +31,51 @@ func RaycheckSphere(r Ray, s Sphere) bool {
     return t0 > 0
 }
 
-// Returns true if inside, and closest coord to space between min and max
-func GetClosestBound(p, min, max float32) (float32, bool) {
-    if p < min {
-        return min, false
-    }
-    if p > max {
-        return max, false
-    }
-    return p, true
-}
-
 func RaycheckBox(r Ray, b Box) bool {
-    ori := []float32 { r.Origin.X, r.Origin.Y, r.Origin.Z }
-    dir := []float32 { r.Direction.X, r.Direction.Y, r.Direction.Z }
-    min := []float32 { b.Min.X, b.Min.Y, b.Min.Z }
-    max := []float32 { b.Max.X, b.Max.Y, b.Max.Z }
+    var tmin, tmax, tymin, tymax, tzmin, tzmax float32
 
-    var steps [3][3]float32
-    var inside [3]bool
+    bounds := [2]Vector{ b.Min, b.Max }
 
-    for i := 0; i < 3; i++ {
-        steps[0][i], inside[i] = GetClosestBound(ori[i], min[i], max[i])
+    divx := 1. / r.Direction.X
+    if divx >= 0 {
+        tmin = (bounds[0].X - r.Origin.X) * divx
+        tmax = (bounds[1].X - r.Origin.X) * divx
+    } else {
+        tmin = (bounds[1].X - r.Origin.X) * divx
+        tmax = (bounds[0].X - r.Origin.X) * divx
     }
 
-    if inside[0] && inside[1] && inside[2] {
-        return true
+    divy := 1. / r.Direction.Y
+    if divy >= 0 {
+        tymin = (bounds[0].Y - r.Origin.Y) * divy
+        tymax = (bounds[1].Y - r.Origin.Y) * divy
+    } else {
+        tymin = (bounds[1].Y - r.Origin.Y) * divy
+        tymax = (bounds[0].Y - r.Origin.Y) * divy
     }
 
-    for i := 0; i < 3; i++ {
-        if !inside[i] && !IsZero(dir[i]) {
-            steps[1][i] = (steps[0][i] - ori[i]) / dir[i]
-        } else {
-            steps[1][i] = -1
-        }
-    }
-
-    t_lim := 0
-    for i := 1; i < 3; i++ {
-        if steps[1][t_lim] < steps[1][i] {
-            t_lim = i
-        }
-    }
-
-    if steps[1][t_lim] < 0 {
+    if tmin > tymax || tymin > tmax {
         return false
     }
 
-    for i := 0; i < 3; i++ {
-        if i == t_lim {
-            steps[2][i] = steps[1][i]
-        } else {
-            steps[2][i] = ori[i] + dir[i] * steps[1][t_lim]
-            if steps[2][i] < min[i] || steps[2][i] > max[i] {
-                return false
-            }
-        }
+    tmin = Max(tmin, tymin)
+    tmax = Min(tmax, tymax)
+
+    divz := 1. / r.Direction.Z
+    if divz >= 0 {
+        tzmin = (bounds[0].Z - r.Origin.Z) * divz
+        tzmax = (bounds[1].Z - r.Origin.Z) * divz
+    } else {
+        tzmin = (bounds[1].Z - r.Origin.Z) * divz
+        tzmax = (bounds[0].Z - r.Origin.Z) * divz
     }
 
-    return true
+    return tmin <= tzmax && tzmin <= tmax
 }
 
 func IntersectPlane(r Ray, a, normal Vector) (bool, Intersection) {
     d := normal.Dot(r.Direction)
 
-    // Normal and ray are perpendicular
     if math.Abs(float64(d)) < EPSYLON {
         return false, Intersection{}
     }
@@ -105,11 +85,8 @@ func IntersectPlane(r Ray, a, normal Vector) (bool, Intersection) {
         return false, Intersection{}
     }
 
-    return true, Intersection{
-            r.Origin.Add(r.Direction.MulScal(t)),
-            normal,
-        }
-
+    out := Intersection{ r.Origin.Add(r.Direction.MulScal(t)), normal, t }
+    return true, out
 }
 
 func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
@@ -144,46 +121,52 @@ func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
     }
 
     bCoord := GetBarycentric(info.Position, t)
-    info.Normal = t.Normals[0].MulScal(bCoord.X).Add(t.Normals[1].MulScal(bCoord.Y)).Add(t.Normals[2].MulScal(bCoord.Z))
+
+    info.Normal = t.Normals[0].MulScal(bCoord.X)
+    info.Normal = info.Normal.Add(t.Normals[1].MulScal(bCoord.Y))
+    info.Normal = info.Normal.Add(t.Normals[2].MulScal(bCoord.Z))
 
     return true, info
 }
 
-func IntersectKDTree(ray Ray, tree *KDTree) (bool, Intersection) {
-    var out Intersection
-    var touch bool
+func IntersectKDTree(ray Ray, tree *KDTree) (touch bool, out Intersection) {
+    out.Distance = float32(math.Inf(1))
+
+    if tree == nil {
+        return false, out
+    }
 
     if !RaycheckBox(ray, tree.BoundingBox) {
         return false, out
     }
 
+
     if tree.Left != nil || tree.Right != nil {
-        if tree.Left != nil {
-            touch, out = IntersectKDTree(ray, tree.Left)
-            if touch {
-                return touch, out
-            }
+        touchR, outR := IntersectKDTree(ray, tree.Left)
+        touchL, outL := IntersectKDTree(ray, tree.Right)
+
+        if outL.Distance < outR.Distance {
+            out = outL
+        } else {
+            out = outR
         }
 
-        if tree.Right != nil {
-            return IntersectKDTree(ray, tree.Right)
+        if touchL || touchR {
+            return true, out
         }
     }
-
-    depth := float32(math.Inf(1))
 
     for _, tri := range tree.Triangles {
         hit, info := IntersectTri(ray, tri)
 
-        dist := info.Position.Sub(ray.Origin).Magnitude()
+        distance := info.Position.Sub(ray.Origin).Magnitude()
 
-        if hit && dist < depth {
+        if hit && distance < out.Distance {
             out = info
-            depth = dist
         }
     }
 
-    return !math.IsInf(float64(depth), 1), out
+    return !math.IsInf(float64(out.Distance), 1), out
 }
 
 func Intersect(ray Ray, obj Object) (bool, Intersection) {

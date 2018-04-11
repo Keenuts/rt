@@ -92,6 +92,7 @@ type Object struct {
 
 type Intersection struct {
     Position, Normal Vector
+    Distance float32
 }
 
 type Ray struct {
