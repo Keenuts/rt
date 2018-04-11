@@ -52,6 +52,8 @@ func SceneFileToScene(file SceneFile, models []Model) (out Scene) {
     out.Name = file.Name
     out.OutputSize = file.OutputSize
     out.Camera = file.Camera
+    out.Camera.Forward = out.Camera.Forward.Normalize()
+    out.Camera.Up = out.Camera.Up.Normalize()
 
     for _, desc := range file.SceneObjects {
         if desc.ObjectID >= len(models) {
