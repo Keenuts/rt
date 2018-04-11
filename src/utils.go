@@ -34,6 +34,14 @@ func Clamp(a, b, x float32) float32 {
     return Max(a, Min(b, x))
 }
 
+func Saturate(v Vector) Vector {
+    return Vector{
+        Clamp(0., 1., v.X),
+        Clamp(0., 1., v.Y),
+        Clamp(0., 1., v.Z),
+    }
+}
+
 func VectorToRGBA(v Vector) color.RGBA {
     v = v.Normalize()
     return color.RGBA{
