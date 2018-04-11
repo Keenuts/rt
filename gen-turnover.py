@@ -115,7 +115,6 @@ def GetVectors(origin, distance, angle):
 def SetCamera(scene, origin, distance, angle):
     position, forward = GetVectors(ORIGIN, DISTANCE, angle)
 
-    print(position, forward)
     scene['Camera']["position"] = position
     scene['Camera']["forward"] = forward
 
