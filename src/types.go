@@ -41,15 +41,16 @@ type Scene struct {
 }
 
 type Config struct {
-    MaxThreads int
     BlockSize int
-    OutputDir string
-    SavePicture bool
-    SaveReport bool
     ForceOutputName bool
+    MaxThreads int
+    OutputDir string
     PictureName string
     ReportName string
+    SavePicture bool
+    SaveReport bool
     SceneName string
+    ShowDebug bool
 }
 
 // Objects related

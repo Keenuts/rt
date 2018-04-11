@@ -1,11 +1,12 @@
 {
-    "maxThreads": 4,
     "blockSize": 16,
-    "outputDir": "/tmp/rendering/",
-    "savePicture": true,
-    "saveReport": true,
     "forceOutputName": true,
+    "maxThreads": 8,
+    "outputDir": "/tmp/rendering/",
     "pictureName": "output.png",
     "reportName": "report.json",
-    "sceneName" : "scenes/teapot.json"
+    "savePicture": true,
+    "saveReport": true,
+    "sceneName" : "scenes/teapot-simplified.json",
+    "showDebug": false
 }
