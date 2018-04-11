@@ -23,6 +23,13 @@ func Min(a, b float32) float32 {
     return b
 }
 
+func AbsInt(a int) int {
+    if a >= 0 {
+        return a
+    }
+    return -a
+}
+
 func Clamp(a, b, x float32) float32 {
     return Max(a, Min(b, x))
 }

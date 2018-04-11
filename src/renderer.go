@@ -103,5 +103,7 @@ func RenderScene(config Config, scene Scene) (output *image.RGBA) {
 
     wg.Wait()
 
-    return RenderWeldBlocks(scene, blockList)
+    output = RenderWeldBlocks(scene, blockList)
+    RasterizerDrawDebug(scene, output)
+    return output
 }
