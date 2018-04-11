@@ -85,7 +85,8 @@ func IntersectPlane(r Ray, a, normal Vector) (bool, Intersection) {
         return false, Intersection{}
     }
 
-    out := Intersection{ r.Origin.Add(r.Direction.MulScal(t)), normal, t }
+    uv := Vector{0, 0, 0}
+    out := Intersection{ r.Origin.Add(r.Direction.MulScal(t)), normal, uv, t }
     return true, out
 }
 
@@ -122,9 +123,15 @@ func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
 
     bCoord := GetBarycentric(info.Position, t)
 
-    info.Normal = t.Normals[0].MulScal(bCoord.X)
-    info.Normal = info.Normal.Add(t.Normals[1].MulScal(bCoord.Y))
-    info.Normal = info.Normal.Add(t.Normals[2].MulScal(bCoord.Z))
+    info.Normal = Vector{ 0, 0, 0 }
+    info.Normal = info.Normal.Add(t.Normals[1].MulScal(bCoord.X))
+    info.Normal = info.Normal.Add(t.Normals[2].MulScal(bCoord.Y))
+    info.Normal = info.Normal.Add(t.Normals[0].MulScal(bCoord.Z))
+
+    info.UV = Vector{ 0, 0, 0 }
+    info.UV = info.UV.Add(t.UV[1].MulScal(bCoord.X))
+    info.UV = info.UV.Add(t.UV[2].MulScal(bCoord.Y))
+    info.UV = info.UV.Add(t.UV[0].MulScal(bCoord.Z))
 
     return true, info
 }
@@ -205,10 +212,12 @@ func TraceRay(config Config, scene Scene, ray Ray) color.Color {
     }
 
     out := Vector{1., 1., 1.}
-    light := Vector{0., -1., 0.02}.Normalize().Neg()
+    light := Vector{0.2, -1., 0.3}.Normalize().Neg()
 
-    out = intersection.Normal.AddScal(1.).MulScal(.5)
-    _ = light
+    //out = intersection.Normal.AddScal(1.).MulScal(.5)
+    //out = CheckerGetColor(intersection.UV)
+    //out = intersection.UV
+    out = out.MulScal(Max(intersection.Normal.Dot(light), .2))
 
-    return VectorToRGBA(out)
+    return VectorToRGBA(Saturate(out))
 }
