@@ -86,8 +86,8 @@ func MeshFindCenter(triangles []Triangle) Vector {
 }
 
 func MeshFindBounds(triangles []Triangle) (box Box, sphere Sphere) {
-    var min = Vector{0, 0, 0}
-    var max = Vector{0, 0, 0}
+    min := triangles[0].Vertex[0]
+    max := triangles[0].Vertex[0]
 
     for _, tri := range triangles {
         min = MinVec(MinVec(MinVec(min, tri.Vertex[0]), tri.Vertex[1]), tri.Vertex[2])
