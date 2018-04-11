@@ -2,9 +2,20 @@ package main
 
 import (
     "bufio"
+    "fmt"
     "github.com/udhos/gwob"
     "os"
 );
+
+func TriangleGetVertex(obj *gwob.Obj, stride int) Vector {
+    x, y, z := obj.VertexCoordinates(stride)
+    return Vector{ x, y, z }
+}
+
+func TriangleGetNormal(obj *gwob.Obj, stride int) Vector {
+    x, y, z := obj.NormCoordinates(stride)
+    return Vector{ x, y, z }
+}
 
 func ModelFromOBJ(filename string) (model Model) {
     f, err := os.Open(filename)
@@ -16,7 +27,13 @@ func ModelFromOBJ(filename string) (model Model) {
     reader := bufio.NewReader(f)
     options := gwob.ObjParserOptions{}
 
+    fmt.Printf("reading %s...", filename)
     obj, err := gwob.NewObjFromReader("", reader, &options)
+
+    if obj.NormCoordFound {
+        fmt.Printf("found normals...")
+    }
+
     if err != nil {
         panic(err)
     }
@@ -32,16 +49,28 @@ func ModelFromOBJ(filename string) (model Model) {
     }
 
     for i := 0; i < len(obj.Indices); i += 3 {
-        vtx := [3]Vector {
-            model.Vertex[obj.Indices[i + 0]],
-            model.Vertex[obj.Indices[i + 1]],
-            model.Vertex[obj.Indices[i + 2]],
+        var vtx [3]Vector
+        var nrm [3]Vector
+
+        for j := 0; j < 3; j++ {
+            vtx[j] = TriangleGetVertex(obj, obj.Indices[i + j])
         }
 
-        t := Triangle { vtx }
+        if obj.NormCoordFound {
+            for j := 0; j < 3; j++ {
+                nrm[j] = TriangleGetNormal(obj, obj.Indices[i + j])
+            }
+        } else {
+			normal := vtx[1].Sub(vtx[0]).Cross(vtx[2].Sub(vtx[0])).Normalize()
+			nrm = [3]Vector{ normal, normal, normal }
+		}
+
+        t := Triangle { vtx, nrm }
         model.Triangles = append(model.Triangles, t)
     }
 
     model.Name = filename
+
+    fmt.Printf("done\n")
     return
 }

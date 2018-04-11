@@ -65,6 +65,7 @@ type Sphere struct {
 
 type Triangle struct {
     Vertex [3]Vector
+    Normals [3]Vector
 }
 
 type Model struct {
