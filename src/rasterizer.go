@@ -120,8 +120,9 @@ func RasterizerDrawDebug(scene Scene, output *image.RGBA) {
 
     red := color.RGBA{ 255, 0, 0, 255 }
 
-    box := Box{ Vector{-1, -1, -1}, Vector{ 1, 1, 1 }, 0 }
-    RasterizerDrawBoundingBox(scene, box, red, output)
+    for _, o := range scene.Objects {
+        RasterizerDrawBoundingBox(scene, o.BoundingBox, red, output)
+    }
 
     fmt.Printf("done\n")
 }
