@@ -7,26 +7,33 @@ import (
 func ScreenPointToRay(scene Scene, x, y int) Ray {
     var r Ray
 
-    width := float64(scene.OutputSize[0])
-    height := float64(scene.OutputSize[1])
+    width := float32(scene.OutputSize[0])
+    height := float32(scene.OutputSize[1])
     aspectRatio := width / height
-    fov := DEG2RAD * float64(scene.Camera.Fov) * 0.5
+    fov := DEG2RAD * float32(scene.Camera.Fov) * 0.5
 
-    right := scene.Camera.Up.Cross(scene.Camera.Forward).Neg()
+    right := scene.Camera.Up.Cross(scene.Camera.Forward).Neg().Normalize()
 
-    spX := ((float64(x) + 0.5) / width) * 2. - 1.
-    spY := ((float64(y) + 0.5) / height) * 2. - 1.
-    spY *= -1; // Y coordinate is flipped between img and world
+    var normCoords Vector
+    normCoords.X = (float32(x) + 0.5) / width * 2. - 1.
+    normCoords.Y = (float32(y) + 0.5) / height * 2. - 1.
 
-    spX *= math.Tan(fov) * aspectRatio
-    spY *= math.Tan(fov)
+    zNear := scene.Camera.ZNear / float32(math.Tan(float64(fov)))
+    zFar := scene.Camera.ZFar
 
-    middle := scene.Camera.Position.Add(scene.Camera.Forward)
-    middle = middle.Add(scene.Camera.Up.MulScal(float32(spY)))
-    middle = middle.Add(right.MulScal(float32(spX)))
+    var pCamera Vector
+    pCamera.X = normCoords.X * (-zFar / zNear) * aspectRatio * -1.
+    pCamera.Y = normCoords.Y * (-zFar / zNear)
+    pCamera.Z = zFar
+
+    pForward := scene.Camera.Forward.Normalize().MulScal(pCamera.Z)
+    pUp := scene.Camera.Up.Normalize().MulScal(pCamera.Y)
+    pRight := right.MulScal(pCamera.X)
+
+    pWorld := pForward.Add(pUp).Add(pRight)
 
     r.Origin = scene.Camera.Position
-    r.Direction = middle.Sub(r.Origin).Normalize()
+    r.Direction = pWorld.Sub(r.Origin).Normalize()
 
     return r
 }

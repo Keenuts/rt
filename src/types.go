@@ -29,6 +29,7 @@ type SceneObject struct {
 type Camera struct {
     Position, Forward, Up Vector
     Fov float32
+    ZNear, ZFar float32
 }
 
 type Scene struct {
