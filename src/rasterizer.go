@@ -115,10 +115,34 @@ func RasterizerDrawBoundingBox(scene Scene, box Box, col color.RGBA, out *image.
     }
 }
 
+func RasterizerDrawTree(scene Scene, root KDTree, col color.RGBA, out *image.RGBA) {
+    queue := []*KDTree { &root }
+
+    for len(queue) > 0 {
+        node := queue[0]
+        queue = queue[1:]
+
+        RasterizerDrawBoundingBox(scene, node.BoundingBox, col, out)
+
+        if node.Left != nil {
+            queue = append(queue, node.Left)
+        }
+
+        if node.Right != nil {
+            queue = append(queue, node.Right)
+        }
+    }
+}
+
 func RasterizerDrawDebug(scene Scene, output *image.RGBA) {
     fmt.Printf("drawing debug informations...")
 
     red := color.RGBA{ 255, 0, 0, 255 }
+    green := color.RGBA{ 0, 255, 0, 255 }
+
+    for _, o := range scene.Objects {
+        RasterizerDrawTree(scene, o.Tree, green, output)
+    }
 
     for _, o := range scene.Objects {
         RasterizerDrawBoundingBox(scene, o.BoundingBox, red, output)
