@@ -192,22 +192,21 @@ func Intersect(ray Ray, obj Object) (bool, Intersection) {
 
 func TraceRay(config Config, scene Scene, ray Ray) color.Color {
 
-    depth := float32(math.Inf(1));
     var intersection Intersection
+    intersection.Distance = float32(math.Inf(1))
 
     ray.Direction = ray.Direction.Normalize()
     for _, obj := range scene.Objects {
         hit, info := Intersect(ray, obj)
 
-        if !hit {
+        if !hit || info.Distance > intersection.Distance {
             continue
         }
 
         intersection = info
-        depth = ray.Origin.Sub(info.Position).Magnitude()
     }
 
-    if math.IsInf(float64(depth), 1) {
+    if math.IsInf(float64(intersection.Distance), 1) {
         return color.RGBA{0, 0, 0, 255}
     }
 
