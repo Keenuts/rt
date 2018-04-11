@@ -66,8 +66,7 @@ type Sphere struct {
 }
 
 type Triangle struct {
-    Vertex, Normals [3]Vector
-    UV [2]Vector
+    Vertex, Normals, UV [3]Vector
 }
 
 type Model struct {
@@ -91,7 +90,7 @@ type Object struct {
 // Tracing
 
 type Intersection struct {
-    Position, Normal Vector
+    Position, Normal, UV Vector
     Distance float32
 }
 

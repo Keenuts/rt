@@ -55,8 +55,7 @@ func ModelFromOBJ(filename string) (model Model) {
     }
 
     for i := 0; i < len(obj.Indices); i += 3 {
-        var vtx, nrm [3]Vector
-        var uv [2]Vector
+        var vtx, nrm, uv [3]Vector
 
         for j := 0; j < 3; j++ {
             vtx[j] = TriangleGetVertex(obj, obj.Indices[i + j])
@@ -72,10 +71,9 @@ func ModelFromOBJ(filename string) (model Model) {
         }
 
         if obj.TextCoordFound {
-            uv[0] = TriangleGetUV(obj, obj.Indices[i])
-            uv[1] = TriangleGetUV(obj, obj.Indices[i + 1])
-        } else {
-            uv[0], uv[1] = Vector{ 0, 0, 0 }, Vector{ 0, 0, 0 }
+            for j := 0; j < 3; j++ {
+                uv[j] = TriangleGetUV(obj, obj.Indices[i + j])
+            }
         }
 
         t := Triangle { vtx, nrm, uv }
