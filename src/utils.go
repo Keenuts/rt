@@ -43,7 +43,6 @@ func Saturate(v Vector) Vector {
 }
 
 func VectorToRGBA(v Vector) color.RGBA {
-    v = v.Normalize()
     return color.RGBA{
         uint8(v.X * 255.),
         uint8(v.Y * 255.),
