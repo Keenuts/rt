@@ -143,6 +143,9 @@ func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
         return false, Intersection{}
     }
 
+    bCoord := GetBarycentric(info.Position, t)
+    info.Normal = t.Normals[0].MulScal(bCoord.X).Add(t.Normals[1].MulScal(bCoord.Y)).Add(t.Normals[2].MulScal(bCoord.Z))
+
     return true, info
 }
 
@@ -215,11 +218,14 @@ func TraceRay(config Config, scene Scene, ray Ray) color.Color {
     }
 
     if math.IsInf(float64(depth), 1) {
-        return color.RGBA{255, 0, 0, 255}
+        return color.RGBA{0, 0, 0, 255}
     }
 
     out := Vector{1., 1., 1.}
-    light := Vector{0., -1., 0.02}.Normalize()
+    light := Vector{0., -1., 0.02}.Normalize().Neg()
 
-    return VectorToRGBA(out.MulScal(Clamp(0, 1, intersection.Normal.Dot(light))))
+    out = intersection.Normal.AddScal(1.).MulScal(.5)
+    _ = light
+
+    return VectorToRGBA(out)
 }

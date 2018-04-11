@@ -37,6 +37,23 @@ func VectorToRGBA(v Vector) color.RGBA {
     }
 }
 
+func TriangleSurface(a, b, c Vector) float32 {
+    return b.Sub(a).Cross(a.Sub(c)).Magnitude()
+}
+
+func GetBarycentric(p Vector, tri Triangle) Vector {
+    IAabc := 1. / TriangleSurface(tri.Vertex[0], tri.Vertex[1], tri.Vertex[2])
+    Aapc := TriangleSurface(tri.Vertex[0], p, tri.Vertex[2])
+    Aapb := TriangleSurface(tri.Vertex[0], p, tri.Vertex[1])
+    Abpc := TriangleSurface(tri.Vertex[1], p, tri.Vertex[2])
+
+    u := Aapc * IAabc
+    v := Aapb * IAabc
+    w := Abpc * IAabc
+
+    return Vector{ u, v, w }
+}
+
 func SphereVolume(radius float32) float32 {
     return float32((4. / 3.) * math.Pi * math.Pow(float64(radius), 3))
 }
