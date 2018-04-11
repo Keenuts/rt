@@ -34,17 +34,18 @@ func ModelFromOBJ(filename string) (model Model) {
 
     fmt.Printf("reading %s...", filename)
     obj, err := gwob.NewObjFromReader("", reader, &options)
-
-    if obj.NormCoordFound {
-        fmt.Printf("found normals...")
-    }
-
     if err != nil {
         panic(err)
     }
 
     if len(obj.Indices) % 3 != 0 {
         panic("Invalid mesh. Indices count not a multiple of 3.")
+    }
+    if obj.NormCoordFound {
+        fmt.Printf("found normals...")
+    }
+    if obj.TextCoordFound {
+        fmt.Printf("found UVs...")
     }
 
     vcount := obj.NumberOfElements()
@@ -54,8 +55,8 @@ func ModelFromOBJ(filename string) (model Model) {
     }
 
     for i := 0; i < len(obj.Indices); i += 3 {
-        var vtx [3]Vector
-        var nrm [3]Vector
+        var vtx, nrm [3]Vector
+        var uv [2]Vector
 
         for j := 0; j < 3; j++ {
             vtx[j] = TriangleGetVertex(obj, obj.Indices[i + j])
@@ -70,7 +71,14 @@ func ModelFromOBJ(filename string) (model Model) {
             nrm = [3]Vector{ normal, normal, normal }
         }
 
-        t := Triangle { vtx, nrm }
+        if obj.TextCoordFound {
+            uv[0] = TriangleGetUV(obj, obj.Indices[i])
+            uv[1] = TriangleGetUV(obj, obj.Indices[i + 1])
+        } else {
+            uv[0], uv[1] = Vector{ 0, 0, 0 }, Vector{ 0, 0, 0 }
+        }
+
+        t := Triangle { vtx, nrm, uv }
         model.Triangles = append(model.Triangles, t)
     }
 
