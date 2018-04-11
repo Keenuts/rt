@@ -17,6 +17,11 @@ func TriangleGetNormal(obj *gwob.Obj, stride int) Vector {
     return Vector{ x, y, z }
 }
 
+func TriangleGetUV(obj *gwob.Obj, stride int) Vector {
+    x, y := obj.TextCoordinates(stride)
+    return Vector{ x, y, 0 }
+}
+
 func ModelFromOBJ(filename string) (model Model) {
     f, err := os.Open(filename)
     if err != nil {
@@ -61,9 +66,9 @@ func ModelFromOBJ(filename string) (model Model) {
                 nrm[j] = TriangleGetNormal(obj, obj.Indices[i + j])
             }
         } else {
-			normal := vtx[1].Sub(vtx[0]).Cross(vtx[2].Sub(vtx[0])).Normalize()
-			nrm = [3]Vector{ normal, normal, normal }
-		}
+            normal := vtx[1].Sub(vtx[0]).Cross(vtx[2].Sub(vtx[0])).Normalize()
+            nrm = [3]Vector{ normal, normal, normal }
+        }
 
         t := Triangle { vtx, nrm }
         model.Triangles = append(model.Triangles, t)
