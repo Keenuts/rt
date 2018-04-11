@@ -120,3 +120,12 @@ func MeshFindBounds(triangles []Triangle) (box Box, sphere Sphere) {
 func TriangleFindCenter(t Triangle) Vector {
     return t.Vertex[0].Add(t.Vertex[1].Add(t.Vertex[2])).MulScal(1./3.)
 }
+
+func CheckerGetColor(v Vector) Vector {
+    v.X *= 5
+    v.Y *= 5
+    if (int(v.X) + int(v.Y)) % 2 == 0 {
+        return Vector{0, 0, 0 }
+    }
+    return Vector{1, 1, 1}
+}
