@@ -93,7 +93,8 @@ type Object struct {
 type MaterialLib map[string]Material
 
 type Material struct {
-    Ambiant, Diffuse Vector
+    Diffuse Vector
+    Opacity float64
 }
 
 // Tracing

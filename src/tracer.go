@@ -200,23 +200,31 @@ func Intersect(ray Ray, obj Object) (bool, Intersection) {
     return hit, intersection
 }
 
-func TraceRay(config Config, scene Scene, ray Ray) color.Color {
-
+func IntersectObjects(ray Ray, objects []Object) (bool, Intersection) {
+    var hit bool
     var intersection Intersection
     intersection.Distance = math.Inf(1)
 
     ray.Direction = ray.Direction.Normalize()
-    for _, obj := range scene.Objects {
-        hit, info := Intersect(ray, obj)
+    for _, obj := range objects {
+        touch, info := Intersect(ray, obj)
 
-        if !hit || info.Distance > intersection.Distance {
+        if !touch || info.Distance > intersection.Distance {
             continue
         }
 
+        hit = true
         intersection = info
     }
 
-    if math.IsInf(intersection.Distance, 1) {
+    return hit, intersection
+}
+
+func TraceRay(config Config, scene Scene, ray Ray) color.Color {
+
+    hit, info := IntersectObjects(ray, scene.Objects)
+
+    if !hit {
         return color.RGBA{0, 0, 0, 255}
     }
 
@@ -226,7 +234,7 @@ func TraceRay(config Config, scene Scene, ray Ray) color.Color {
     //out = intersection.Normal.AddScal(1.).MulScal(.5)
     //out = CheckerGetColor(intersection.UV)
     //out = intersection.UV
-    out = out.MulScal(Max(intersection.Normal.Dot(light), .2))
+    out = out.MulScal(Max(info.Normal.Dot(light), .2))
 
     return VectorToRGBA(Saturate(out))
 }

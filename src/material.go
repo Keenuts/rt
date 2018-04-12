@@ -28,8 +28,11 @@ func MaterialLibFromMTL(filename string) (lib MaterialLib) {
         var m Material
 
         m.Diffuse = Vector{ value.Kd[0], value.Kd[1], value.Kd[2] }
+        m.Opacity = value.D
         lib[key] = m
     }
 
+    fmt.Printf("done\n")
+    fmt.Println(lib)
     return
 }
