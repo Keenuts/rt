@@ -32,6 +32,12 @@ func ObjectTransform(obj Object, desc SceneObject) {
             tri.Vertex[j] = v
         }
 
+        for j := 0; j < 3; j++ {
+            v := tri.Normals[j].RotateDeg(desc.Rotation)
+
+            tri.Normals[j] = v.Normalize()
+        }
+
         obj.Triangles[i] = tri
     }
 }
