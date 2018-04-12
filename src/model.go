@@ -66,7 +66,7 @@ func ModelFromOBJ(filename string) (model Model) {
                 nrm[j] = TriangleGetNormal(obj, obj.Indices[i + j])
             }
         } else {
-            normal := vtx[1].Sub(vtx[0]).Cross(vtx[2].Sub(vtx[0])).Normalize()
+            normal := vtx[2].Sub(vtx[0]).Cross(vtx[1].Sub(vtx[0])).Normalize()
             nrm = [3]Vector{ normal, normal, normal }
         }
 
