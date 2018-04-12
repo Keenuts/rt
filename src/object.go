@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-func CreateObject(desc SceneObject, model Model) (out Object) {
+func CreateObject(desc SceneObject, model Model, mtl Material) (out Object) {
     fmt.Printf("preprocessing %s...", model.Name)
 
     out.Name = model.Name
@@ -15,6 +15,7 @@ func CreateObject(desc SceneObject, model Model) (out Object) {
     out.Center = MeshFindCenter(out.Triangles)
     out.BoundingBox, out.BoundingSphere = MeshFindBounds(out.Triangles)
     out.Tree = TreeCreate(out.Triangles)
+    out.Material = mtl
 
     fmt.Printf("done\n")
     return

@@ -16,48 +16,73 @@
             "models/cube.obj"
     ],
 
+    "MaterialLibs": [
+            "materials/cornell-box.mtl"
+    ],
+
     "SceneObjects": [
         {
             "objectId": 0,
             "position": { "x":0, "y":0, "z":5 },
             "rotation": { "x":0, "y":0, "z":0 },
             "scale":    { "x":3, "y":3, "z":1 },
+            "materialLibId": 0,
+            "materialName": "white-wall",
+            "debugName": "front-wall"
         },
         {
             "objectId": 0,
             "position": { "x":0, "y":-3, "z":1 },
             "rotation": { "x":90, "y":0, "z":0 },
-            "scale":    { "x":3, "y":4, "z":1 }
+            "scale":    { "x":3, "y":4, "z":1 },
+            "materialLibId": 0,
+            "materialName": "white-wall",
+            "debugName": "ground"
         },
         {
             "objectId": 0,
             "position": { "x":3, "y":0, "z":1 },
             "rotation": { "x":0, "y":90, "z":0 },
-            "scale":    { "x":4, "y":3, "z":1 }
+            "scale":    { "x":4, "y":3, "z":1 },
+            "materialLibId": 0,
+            "materialName": "blue-wall",
+            "debugName": "right-wall"
         },
         {
             "objectId": 0,
             "position": { "x":-3, "y":0, "z":1 },
             "rotation": { "x":0, "y":-90, "z":0 },
-            "scale":    { "x":4, "y":3, "z":1 }
+            "scale":    { "x":4, "y":3, "z":1 },
+            "materialLibId": 0,
+            "materialName": "red-wall",
+            "debugName": "left-wall"
         },
         {
             "objectId": 0,
             "position": { "x":0, "y":3, "z":1 },
             "rotation": { "x":-90, "y":0, "z":0 },
-            "scale":    { "x":3, "y":4, "z":1 }
+            "scale":    { "x":3, "y":4, "z":1 },
+            "materialLibId": 0,
+            "materialName": "white-wall",
+            "debugName": "roof"
         },
         {
             "objectId": 1,
             "position": { "x":1.4, "y":-1, "z":1.5 },
             "rotation": { "x":0, "y":45, "z":0 },
-            "scale":    { "x":1, "y":2, "z":1 }
+            "scale":    { "x":1, "y":2, "z":1 },
+            "materialLibId": 0,
+            "materialName": "white-wall",
+            "debugName": "tall-box"
         },
         {
             "objectId": 1,
             "position": { "x":-1.4, "y":-2, "z":2 },
             "rotation": { "x":0, "y":-60, "z":0 },
-            "scale":    { "x":1, "y":1, "z":1 }
+            "scale":    { "x":1, "y":1, "z":1 },
+            "materialLibId": 0,
+            "materialName": "white-wall",
+            "debugName": "small-box"
         }
     ]
 }

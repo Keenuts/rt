@@ -86,7 +86,11 @@ func IntersectPlane(r Ray, a, normal Vector) (bool, Intersection) {
     }
 
     uv := Vector{0, 0, 0}
-    out := Intersection{ r.Origin.Add(r.Direction.MulScal(t)), normal, uv, t }
+    var out Intersection
+    out.Position = r.Origin.Add(r.Direction.MulScal(t))
+    out.Normal = normal
+    out.UV = uv
+    out.Distance = t
     return true, out
 }
 
@@ -178,6 +182,7 @@ func IntersectKDTree(ray Ray, tree *KDTree) (touch bool, out Intersection) {
 
 func Intersect(ray Ray, obj Object) (bool, Intersection) {
     var intersection Intersection
+    var hit bool
 
     if !RaycheckSphere(ray, obj.BoundingSphere) {
         return false, intersection
@@ -187,7 +192,12 @@ func Intersect(ray Ray, obj Object) (bool, Intersection) {
         return false, intersection
     }
 
-    return IntersectKDTree(ray, &obj.Tree)
+    hit, intersection = IntersectKDTree(ray, &obj.Tree)
+    if hit {
+        intersection.Object = obj
+    }
+
+    return hit, intersection
 }
 
 func TraceRay(config Config, scene Scene, ray Ray) color.Color {

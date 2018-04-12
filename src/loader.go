@@ -17,6 +17,7 @@ type SceneFile struct {
 
     Camera Camera
     Meshs []string
+    MaterialLibs []string
 
     SceneObjects []SceneObject
 }
@@ -48,7 +49,7 @@ func LoadJSON(filename string, storage interface{}) {
     }
 }
 
-func SceneFileToScene(file SceneFile, models []Model) (out Scene) {
+func SceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (out Scene) {
     out.Name = file.Name
     out.OutputSize = file.OutputSize
     out.Camera = file.Camera
@@ -60,7 +61,13 @@ func SceneFileToScene(file SceneFile, models []Model) (out Scene) {
             panic("Invalid object ID")
         }
 
-        dst := CreateObject(desc, models[desc.ObjectID])
+        var mtl Material
+        if len(mtlLibs) > desc.MaterialLibID {
+            mtl = mtlLibs[desc.MaterialLibID][desc.MaterialName]
+        } else {
+            mtl.Diffuse = Vector{ 1, 1, 1 }
+        }
+        dst := CreateObject(desc, models[desc.ObjectID], mtl)
         out.Objects = append(out.Objects, dst)
     }
 
@@ -76,7 +83,12 @@ func LoadScene(filename string) Scene {
         models = append(models, ModelFromOBJ(path))
     }
 
-    return SceneFileToScene(file, models)
+    var materialLibs []MaterialLib
+    for _,path := range file.MaterialLibs {
+        materialLibs = append(materialLibs, MaterialLibFromMTL(path))
+    }
+
+    return SceneFileToScene(file, models, materialLibs)
 }
 
 func LoadConfig(filename string) Config {

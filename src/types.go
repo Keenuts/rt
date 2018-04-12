@@ -21,9 +21,10 @@ type RenderInfo struct {
 
 type SceneObject struct {
     ObjectID int
-    Position Vector
-    Rotation Vector
-    Scale Vector
+    Position, Rotation, Scale Vector
+    MaterialLibID int
+    MaterialName string
+    DebugName string
 }
 
 type Camera struct {
@@ -84,14 +85,23 @@ type Object struct {
 
     Triangles []Triangle
     Tree KDTree
+    Material Material
 }
 
+// Material related
+
+type MaterialLib map[string]Material
+
+type Material struct {
+    Ambiant, Diffuse Vector
+}
 
 // Tracing
 
 type Intersection struct {
     Position, Normal, UV Vector
     Distance float32
+    Object Object
 }
 
 type Ray struct {
