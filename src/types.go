@@ -3,10 +3,10 @@ package main
 // Maths
 
 type Vector struct {
-    X, Y, Z float32
+    X, Y, Z float64
 }
 
-type Mat3 [3][3]float32
+type Mat3 [3][3]float64
 
 // Scene related
 
@@ -29,8 +29,8 @@ type SceneObject struct {
 
 type Camera struct {
     Position, Forward, Up Vector
-    Fov float32
-    ZNear, ZFar float32
+    Fov float64
+    ZNear, ZFar float64
 }
 
 type Scene struct {
@@ -58,12 +58,12 @@ type Config struct {
 
 type Box struct {
     Min, Max Vector
-    Volume float32
+    Volume float64
 }
 
 type Sphere struct {
     Center Vector
-    Radius, Volume float32
+    Radius, Volume float64
 }
 
 type Triangle struct {
@@ -100,7 +100,7 @@ type Material struct {
 
 type Intersection struct {
     Position, Normal, UV Vector
-    Distance float32
+    Distance float64
     Object Object
 }
 

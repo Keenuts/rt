@@ -5,18 +5,18 @@ import (
     "math"
 );
 
-func Lerp(a, b, x float32) float32 {
+func Lerp(a, b, x float64) float64 {
     return a * (1. - x) + b * x
 }
 
-func Max(a, b float32) float32 {
+func Max(a, b float64) float64 {
     if a > b {
         return a
     }
     return b
 }
 
-func Min(a, b float32) float32 {
+func Min(a, b float64) float64 {
     if a < b {
         return a
     }
@@ -30,7 +30,7 @@ func AbsInt(a int) int {
     return -a
 }
 
-func Clamp(a, b, x float32) float32 {
+func Clamp(a, b, x float64) float64 {
     return Max(a, Min(b, x))
 }
 
@@ -51,7 +51,7 @@ func VectorToRGBA(v Vector) color.RGBA {
     }
 }
 
-func TriangleSurface(a, b, c Vector) float32 {
+func TriangleSurface(a, b, c Vector) float64 {
     return b.Sub(a).Cross(a.Sub(c)).Magnitude()
 }
 
@@ -68,11 +68,11 @@ func GetBarycentric(p Vector, tri Triangle) Vector {
     return Vector{ u, v, w }
 }
 
-func SphereVolume(radius float32) float32 {
-    return float32((4. / 3.) * math.Pi * math.Pow(float64(radius), 3))
+func SphereVolume(radius float64) float64 {
+    return (4. / 3.) * math.Pi * math.Pow(radius, 3)
 }
 
-func BoxVolume(min, max Vector) float32 {
+func BoxVolume(min, max Vector) float64 {
     x := max.X - min.X
     y := max.Y - min.Y
     z := max.Z - min.Z
@@ -80,7 +80,7 @@ func BoxVolume(min, max Vector) float32 {
     return x * z * y
 }
 
-func IsZero(f float32) bool {
+func IsZero(f float64) bool {
     if f < 0 {
         return f > -EPSYLON
     }
@@ -89,7 +89,7 @@ func IsZero(f float32) bool {
 
 func MeshFindCenter(triangles []Triangle) Vector {
     var sum Vector
-    divider := 1. / float32(len(triangles) * 3)
+    divider := 1. / float64(len(triangles) * 3)
 
     for _, tri := range triangles {
         v := tri.Vertex[0].Add(tri.Vertex[1]).Add(tri.Vertex[2])

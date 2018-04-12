@@ -6,32 +6,26 @@ import (
 
 // Warning: Matrix are written like this: [ [col1] [col2] [col3] ]
 // Don't be fooled by the layout
-func MatrixCreateRotateX(angle float32) (m Mat3) {
-    angleD := float64(angle)
-
+func MatrixCreateRotateX(angle float64) (m Mat3) {
     return Mat3{
-        { 1,    0,                             0 },
-        { 0,    float32(math.Cos(angleD)),     float32(math.Sin(angleD)) },
-        { 0,    float32(-math.Sin(angleD)),    float32(math.Cos(angleD)) },
+        { 1, 0,                              0 },
+        { 0, math.Cos(angle),  math.Sin(angle) },
+        { 0, -math.Sin(angle), math.Cos(angle) },
     }
 }
 
-func MatrixCreateRotateY(angle float32) (m Mat3) {
-    angleD := float64(angle)
-
+func MatrixCreateRotateY(angle float64) (m Mat3) {
     return Mat3{
-        { float32(math.Cos(angleD)),    0,  float32(-math.Sin(angleD)) },
+        { math.Cos(angle),    0,  -math.Sin(angle) },
         { 0,                            1,  0 },
-        { float32(math.Sin(angleD)),    0,  float32(math.Cos(angleD)) },
+        { math.Sin(angle),    0,  math.Cos(angle) },
     }
 }
 
-func MatrixCreateRotateZ(angle float32) (m Mat3) {
-    angleD := float64(angle)
-
+func MatrixCreateRotateZ(angle float64) (m Mat3) {
     return Mat3{
-        { float32(math.Cos(angleD)),    float32(math.Sin(angleD)),  0 },
-        { float32(-math.Sin(angleD)),   float32(math.Cos(angleD)),  0 },
+        { math.Cos(angle),    math.Sin(angle),  0 },
+        { -math.Sin(angle),   math.Cos(angle),  0 },
         { 0,                            0,                          1 },
     }
 }

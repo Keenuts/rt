@@ -3,7 +3,7 @@ package main
 import "math"
 
 func VecFromInt(x, y, z int) Vector {
-    return Vector{float32(x), float32(y), float32(z)}
+    return Vector{float64(x), float64(y), float64(z)}
 }
 
 func (a Vector) Add(b Vector) Vector {
@@ -30,11 +30,11 @@ func (a Vector) RotateRad(b Vector) Vector {
     return mZ.Mul(mY.Mul(mX.Mul(a)))
 }
 
-func (a Vector) MulScal(m float32) Vector {
+func (a Vector) MulScal(m float64) Vector {
     return Vector{ a.X * m, a.Y * m, a.Z * m }
 }
 
-func (a Vector) AddScal(s float32) Vector {
+func (a Vector) AddScal(s float64) Vector {
     return Vector{ a.X + s, a.Y + s, a.Z + s }
 }
 
@@ -42,8 +42,8 @@ func (a Vector) Neg() Vector {
     return Vector{ -a.X, -a.Y, -a.Z }
 }
 
-func (v Vector) Magnitude() float32 {
-    return float32(math.Sqrt(float64(v.X * v.X + v.Y * v.Y + v.Z * v.Z)))
+func (v Vector) Magnitude() float64 {
+    return math.Sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z)
 }
 
 func (v Vector) Normalize() Vector {
@@ -63,7 +63,7 @@ func (a Vector) Cross(b Vector) Vector {
     }
 }
 
-func (a Vector) Dot(b Vector) float32 {
+func (a Vector) Dot(b Vector) float64 {
     return a.X * b.X + a.Y * b.Y + a.Z * b.Z
 }
 

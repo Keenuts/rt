@@ -7,18 +7,18 @@ import (
 func ScreenPointToRay(scene Scene, x, y int) Ray {
     var r Ray
 
-    width := float32(scene.OutputSize[0])
-    height := float32(scene.OutputSize[1])
+    width := float64(scene.OutputSize[0])
+    height := float64(scene.OutputSize[1])
     aspectRatio := width / height
-    fov := DEG2RAD * float32(scene.Camera.Fov) * 0.5
+    fov := DEG2RAD * scene.Camera.Fov * 0.5
 
     right := scene.Camera.Up.Cross(scene.Camera.Forward).Neg().Normalize()
 
     var normCoords Vector
-    normCoords.X = (float32(x) + 0.5) / width * 2. - 1.
-    normCoords.Y = (float32(y) + 0.5) / height * 2. - 1.
+    normCoords.X = (float64(x) + 0.5) / width * 2. - 1.
+    normCoords.Y = (float64(y) + 0.5) / height * 2. - 1.
 
-    zNear := scene.Camera.ZNear / float32(math.Tan(float64(fov)))
+    zNear := scene.Camera.ZNear / math.Tan(fov)
     zFar := scene.Camera.ZFar
 
     var pCamera Vector

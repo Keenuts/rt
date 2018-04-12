@@ -16,7 +16,7 @@ func RaycheckSphere(r Ray, s Sphere) bool {
         return false
     }
 
-    d := float32(math.Sqrt(float64(rad2 - d2)))
+    d := math.Sqrt(rad2 - d2)
     t0 := v - d
     t1 := v + d
 
@@ -32,7 +32,7 @@ func RaycheckSphere(r Ray, s Sphere) bool {
 }
 
 func RaycheckBox(r Ray, b Box) bool {
-    var tmin, tmax, tymin, tymax, tzmin, tzmax float32
+    var tmin, tmax, tymin, tymax, tzmin, tzmax float64
 
     bounds := [2]Vector{ b.Min, b.Max }
 
@@ -76,7 +76,7 @@ func RaycheckBox(r Ray, b Box) bool {
 func IntersectPlane(r Ray, a, normal Vector) (bool, Intersection) {
     d := normal.Dot(r.Direction)
 
-    if math.Abs(float64(d)) < EPSYLON {
+    if math.Abs(d) < EPSYLON {
         return false, Intersection{}
     }
 
@@ -141,7 +141,7 @@ func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
 }
 
 func IntersectKDTree(ray Ray, tree *KDTree) (touch bool, out Intersection) {
-    out.Distance = float32(math.Inf(1))
+    out.Distance = math.Inf(1)
 
     if tree == nil {
         return false, out
@@ -177,7 +177,7 @@ func IntersectKDTree(ray Ray, tree *KDTree) (touch bool, out Intersection) {
         }
     }
 
-    return !math.IsInf(float64(out.Distance), 1), out
+    return !math.IsInf(out.Distance, 1), out
 }
 
 func Intersect(ray Ray, obj Object) (bool, Intersection) {
@@ -203,7 +203,7 @@ func Intersect(ray Ray, obj Object) (bool, Intersection) {
 func TraceRay(config Config, scene Scene, ray Ray) color.Color {
 
     var intersection Intersection
-    intersection.Distance = float32(math.Inf(1))
+    intersection.Distance = math.Inf(1)
 
     ray.Direction = ray.Direction.Normalize()
     for _, obj := range scene.Objects {
@@ -216,7 +216,7 @@ func TraceRay(config Config, scene Scene, ray Ray) color.Color {
         intersection = info
     }
 
-    if math.IsInf(float64(intersection.Distance), 1) {
+    if math.IsInf(intersection.Distance, 1) {
         return color.RGBA{0, 0, 0, 255}
     }
 

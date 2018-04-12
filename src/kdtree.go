@@ -55,11 +55,11 @@ func TreeCreate(triangles []Triangle) (root KDTree) {
 
 func TreeCreateBuckets(axis int, triangles []Triangle) (left, right []Triangle) {
     middleV := MeshFindCenter(triangles)
-    middle := [3]float32 { middleV.X, middleV.Y, middleV.Z }
+    middle := [3]float64 { middleV.X, middleV.Y, middleV.Z }
 
     for _, tri := range triangles {
         mtriV := TriangleFindCenter(tri)
-        mtri := [3]float32 { mtriV.X, mtriV.Y, mtriV.Z }
+        mtri := [3]float64 { mtriV.X, mtriV.Y, mtriV.Z }
 
         if mtri[axis] < middle[axis] {
             left = append(left, tri)

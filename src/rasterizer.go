@@ -46,17 +46,17 @@ func WorldToCamera(p Vector, camera Camera) Vector {
     var tR Mat3
     right := camera.Up.Cross(camera.Forward).Neg()
 
-    tR[0] = [3]float32{ right.X, camera.Up.X, camera.Forward.X }
-    tR[1] = [3]float32{ right.Y, camera.Up.Y, camera.Forward.Y }
-    tR[2] = [3]float32{ right.Z, camera.Up.Z, camera.Forward.Z }
+    tR[0] = [3]float64{ right.X, camera.Up.X, camera.Forward.X }
+    tR[1] = [3]float64{ right.Y, camera.Up.Y, camera.Forward.Y }
+    tR[2] = [3]float64{ right.Z, camera.Up.Z, camera.Forward.Z }
 
     return tR.Mul(p.Sub(camera.Position))
 }
 
 func CameraToScreen(scene Scene, pCamera Vector) Vector {
     fov := scene.Camera.Fov * .5 * DEG2RAD
-    fovTan := float32(math.Tan(float64(fov)))
-    aspectRatio := float32(scene.OutputSize[0]) / float32(scene.OutputSize[1])
+    fovTan := math.Tan(fov)
+    aspectRatio := float64(scene.OutputSize[0]) / float64(scene.OutputSize[1])
 
     var canvasSize Vector
     canvasSize.X = fovTan * scene.Camera.ZNear * aspectRatio
@@ -74,8 +74,8 @@ func CameraToScreen(scene Scene, pCamera Vector) Vector {
     pNDC.Z = pScreen.Z
 
     var pImage Vector
-    pImage.X = (pNDC.X + 1.) * .5 * float32(scene.OutputSize[0])
-    pImage.Y = (pNDC.Y + 1.) * .5 * float32(scene.OutputSize[1])
+    pImage.X = (pNDC.X + 1.) * .5 * float64(scene.OutputSize[0])
+    pImage.Y = (pNDC.Y + 1.) * .5 * float64(scene.OutputSize[1])
     pImage.Z = pScreen.Z
 
     return pImage
