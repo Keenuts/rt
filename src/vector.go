@@ -80,6 +80,9 @@ func reflect(in, n Vector) (out Vector) {
 }
 
 func refract(in, n Vector, eta float64) (out Vector) {
+    n = n.Normalize()
+    in = in.Normalize()
+
     cosi := in.Neg().Dot(n)
     cost2 := 1. - eta * eta * (1. - cosi * cosi)
     t := in.MulScal(eta).Add(n.MulScal(cosi * eta - math.Sqrt(math.Abs(cost2))))
