@@ -10,19 +10,44 @@ import (
 
 type Task struct {
     Area image.Rectangle
-    Buffer *image.RGBA
+    Pixels *image.RGBA
+    Depth [][]float64
 };
+
+func BlitDepthBuffer(out, in [][]float64, rect image.Rectangle) {
+    for y := rect.Min.Y; y < rect.Max.Y; y++ {
+        for x := rect.Min.X; x < rect.Max.X; x++ {
+            out[y][x] = in[y - rect.Min.Y][x - rect.Min.X]
+        }
+    }
+}
+
+func CreateDepthBuffer(width, height int) [][]float64 {
+    depth := make([][]float64, height)
+    for id, _ := range depth {
+        depth[id] = make([]float64, width)
+    }
+
+    return depth
+}
 
 func RenderArea(config Config, scene Scene, task *Task) {
     rect := image.Rect(0, 0, config.BlockSize, config.BlockSize)
-    task.Buffer = image.NewRGBA(rect)
+    task.Pixels = image.NewRGBA(rect)
+    task.Depth = CreateDepthBuffer(config.BlockSize, config.BlockSize)
+
+    var frame Frame
+    frame.Pixels = task.Pixels
+    frame.Depth = task.Depth
 
     for y := 0; y < config.BlockSize; y++ {
         for x := 0; x < config.BlockSize; x++ {
 
             r := ScreenPointToRay(scene, task.Area.Min.X + x, task.Area.Min.Y + y)
-            px := TraceRay(config, scene, r)
-            task.Buffer.Set(x, y, px)
+            color, depth := TraceRay(config, scene, r)
+
+            frame.Pixels.Set(x, y, VectorToRGBA(color))
+            frame.Depth[y][x] = depth
         }
     }
 }
@@ -42,20 +67,24 @@ func CreateRenderTasks(config Config, scene Scene) (taskList []Task) {
     return
 }
 
-func RenderWeldBlocks(scene Scene, blockList []Task) *image.RGBA {
+func RenderWeldBlocks(scene Scene, blockList []Task) (frame Frame) {
     fmt.Printf("welding blocks...\r")
     rect := image.Rect(0, 0, scene.OutputSize[0], scene.OutputSize[1])
-    output := image.NewRGBA(rect)
+    frame.Pixels = image.NewRGBA(rect)
+    frame.Depth = CreateDepthBuffer(scene.OutputSize[0], scene.OutputSize[1])
+    frame.Width = scene.OutputSize[0]
+    frame.Height = scene.OutputSize[1]
 
     for _, elt := range blockList {
-        draw.Draw(output, elt.Area, elt.Buffer, image.ZP, draw.Src)
+        draw.Draw(frame.Pixels, elt.Area, elt.Pixels, image.ZP, draw.Src)
+        BlitDepthBuffer(frame.Depth, elt.Depth, elt.Area)
     }
 
     fmt.Printf("welding blocks...done\n")
-    return output
+    return frame
 }
 
-func RenderScene(config Config, scene Scene) (output *image.RGBA) {
+func RenderScene(config Config, scene Scene) *image.RGBA {
 
     taskList := CreateRenderTasks(config, scene)
     blockList := make([]Task, 0)
@@ -103,11 +132,11 @@ func RenderScene(config Config, scene Scene) (output *image.RGBA) {
 
     wg.Wait()
 
-    output = RenderWeldBlocks(scene, blockList)
+    frame := RenderWeldBlocks(scene, blockList)
 
     if config.ShowDebug {
-        RasterizerDrawDebug(scene, output)
+        RasterizerDrawDebug(scene, frame)
     }
 
-    return output
+    return frame.Pixels
 }

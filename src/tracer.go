@@ -1,7 +1,6 @@
 package main
 
 import (
-    "image/color"
     "math"
 );
 
@@ -170,9 +169,9 @@ func IntersectKDTree(ray Ray, tree *KDTree) (touch bool, out Intersection) {
     for _, tri := range tree.Triangles {
         hit, info := IntersectTri(ray, tri)
 
-        distance := info.Position.Sub(ray.Origin).Magnitude()
+        info.Distance = info.Position.Sub(ray.Origin).Magnitude()
 
-        if hit && distance < out.Distance {
+        if hit && info.Distance < out.Distance {
             out = info
         }
     }
@@ -220,21 +219,22 @@ func IntersectObjects(ray Ray, objects []Object) (bool, Intersection) {
     return hit, intersection
 }
 
-func TraceRay(config Config, scene Scene, ray Ray) color.Color {
+func TraceRay(config Config, scene Scene, ray Ray) (Vector, float64) {
 
     hit, info := IntersectObjects(ray, scene.Objects)
 
     if !hit {
-        return color.RGBA{0, 0, 0, 255}
+        return Vector{0, 0, 0}, math.Inf(1)
     }
 
-    out := Vector{1., 1., 1.}
     light := Vector{0.2, -1., 0.3}.Normalize().Neg()
+    diffuse := info.Object.Material.Diffuse
 
     //out = intersection.Normal.AddScal(1.).MulScal(.5)
     //out = CheckerGetColor(intersection.UV)
     //out = intersection.UV
-    out = out.MulScal(Max(info.Normal.Dot(light), .2))
+    //out = out.MulScal(Max(info.Normal.Dot(light), .2))
+    diffuse = diffuse.MulScal(Max(info.Normal.Dot(light), .2))
 
-    return VectorToRGBA(Saturate(out))
+    return Saturate(diffuse), info.Distance
 }

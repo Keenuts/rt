@@ -1,5 +1,9 @@
 package main
 
+import (
+    "image"
+);
+
 // Maths
 
 type Vector struct {
@@ -97,7 +101,7 @@ type Material struct {
     Opacity float64
 }
 
-// Tracing
+// Tracing & Rasterizing
 
 type Intersection struct {
     Position, Normal, UV Vector
@@ -114,4 +118,20 @@ type KDTree struct {
 
     BoundingBox Box
     Triangles []Triangle
+}
+
+type Frame struct {
+    Pixels *image.RGBA
+    Depth [][]float64
+    Width, Height int
+}
+
+type Point struct {
+    Position Vector
+    Color color.RGBA
+}
+
+type Line struct {
+    A, B Vector
+    Color color.RGBA
 }
