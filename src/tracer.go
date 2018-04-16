@@ -219,6 +219,35 @@ func IntersectObjects(ray Ray, objects []Object) (bool, Intersection) {
     return hit, intersection
 }
 
+func TraceRefraction(scene Scene, ray Ray, info Intersection) Vector {
+    ratioOut := info.Object.Material.Refraction
+    ratioIn := 1.0 / ratioOut
+
+    posA := info.Position
+    norA := info.Normal
+
+    var ray2 Ray
+    ray2.Origin = posA.Add(norA.MulScal(-EPSYLON))
+    ray2.Direction = refract(ray.Direction, info.Normal, ratioIn)
+    ray2.InvertCulling = true
+
+    hit2, info2 := Intersect(ray2, info.Object)
+
+    if !hit2 || info2.Object.ID != info.Object.ID {
+        return info.Object.Material.Diffuse
+    }
+
+    posB := info2.Position
+    norB := info2.Normal
+
+    var ray3 Ray
+    ray3.Origin = posB.Add(norB.MulScal(EPSYLON))
+    ray3.Direction = refract(ray2.Direction, info2.Normal.Neg(), ratioOut)
+
+    refracted, _ := TraceRay(scene, ray3)
+    return refracted
+}
+
 func TraceRay(scene Scene, ray Ray) (Vector, float64) {
 
     hit, info := IntersectObjects(ray, scene.Objects)
@@ -228,6 +257,12 @@ func TraceRay(scene Scene, ray Ray) (Vector, float64) {
     }
 
     diffuse := info.Object.Material.Diffuse
+    opacity := info.Object.Material.Opacity
+
+    if opacity < 1.0 - EPSYLON {
+        refracted := TraceRefraction(scene, ray, info)
+        diffuse = diffuse.MulScal(opacity).Add(refracted.MulScal(1.0 - opacity))
+    }
 
 
     return Saturate(diffuse), info.Distance

@@ -29,6 +29,7 @@ func MaterialLibFromMTL(filename string) (lib MaterialLib) {
 
         m.Diffuse = Vector{ value.Kd[0], value.Kd[1], value.Kd[2] }
         m.Opacity = value.D
+        m.Refraction = value.Refr
         lib[key] = m
     }
 
