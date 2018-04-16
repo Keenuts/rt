@@ -82,6 +82,7 @@ type Model struct {
 }
 
 type Object struct {
+    ID int
     Name string
 
     Center Vector

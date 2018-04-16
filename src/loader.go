@@ -55,6 +55,7 @@ func SceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (ou
     out.Camera = file.Camera
     out.Camera.Forward = out.Camera.Forward.Normalize()
     out.Camera.Up = out.Camera.Up.Normalize()
+    ObjectID := 0
 
     for _, desc := range file.SceneObjects {
         if desc.ObjectID >= len(models) {
@@ -68,7 +69,10 @@ func SceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (ou
             mtl.Diffuse = Vector{ 1, 1, 1 }
         }
         dst := CreateObject(desc, models[desc.ObjectID], mtl)
+        dst.ID = ObjectID
+
         out.Objects = append(out.Objects, dst)
+        ObjectID += 1
     }
 
     return
