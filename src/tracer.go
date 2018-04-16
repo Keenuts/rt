@@ -100,7 +100,7 @@ func IntersectTri(r Ray, t Triangle) (bool, Intersection) {
     ca := t.Vertex[0].Sub(t.Vertex[2]).Normalize()
     normal := ab.Cross(ac).Normalize()
 
-    if normal.Dot(r.Direction) < 0 {
+    if normal.Dot(r.Direction) < 0 && !r.InvertCulling {
         return false, Intersection{}
     }
 

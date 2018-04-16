@@ -111,6 +111,7 @@ type Intersection struct {
 
 type Ray struct {
     Origin, Direction Vector
+    InvertCulling bool
 }
 
 type KDTree struct {
