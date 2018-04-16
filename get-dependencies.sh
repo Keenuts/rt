@@ -1,3 +1,3 @@
 #!/bin/bash
 
-go get github.com/udhos/gwob
+go get github.com/Keenuts/gwob
