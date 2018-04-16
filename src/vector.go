@@ -76,6 +76,9 @@ func MaxVec(a, b Vector) Vector {
 }
 
 func reflect(in, n Vector) (out Vector) {
+    in = in.Normalize()
+    n = n.Normalize()
+
     return in.Sub(n.MulScal(2. * n.Dot(in)))
 }
 
