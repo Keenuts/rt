@@ -219,7 +219,7 @@ func IntersectObjects(ray Ray, objects []Object) (bool, Intersection) {
     return hit, intersection
 }
 
-func TraceRay(config Config, scene Scene, ray Ray) (Vector, float64) {
+func TraceRay(scene Scene, ray Ray) (Vector, float64) {
 
     hit, info := IntersectObjects(ray, scene.Objects)
 
@@ -227,14 +227,8 @@ func TraceRay(config Config, scene Scene, ray Ray) (Vector, float64) {
         return Vector{0, 0, 0}, math.Inf(1)
     }
 
-    light := Vector{0.2, -1., 0.3}.Normalize().Neg()
     diffuse := info.Object.Material.Diffuse
 
-    //out = intersection.Normal.AddScal(1.).MulScal(.5)
-    //out = CheckerGetColor(intersection.UV)
-    //out = intersection.UV
-    //out = out.MulScal(Max(info.Normal.Dot(light), .2))
-    diffuse = diffuse.MulScal(Max(info.Normal.Dot(light), .2))
 
     return Saturate(diffuse), info.Distance
 }

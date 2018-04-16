@@ -44,7 +44,7 @@ func RenderArea(config Config, scene Scene, task *Task) {
         for x := 0; x < config.BlockSize; x++ {
 
             r := ScreenPointToRay(scene, task.Area.Min.X + x, task.Area.Min.Y + y)
-            color, depth := TraceRay(config, scene, r)
+            color, depth := TraceRay(scene, r)
 
             frame.Pixels.Set(x, y, VectorToRGBA(color))
             frame.Depth[y][x] = depth
