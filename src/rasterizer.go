@@ -64,6 +64,7 @@ func CameraToScreen(scene Scene, pCamera Vector) Vector {
     canvasSize.Y = fovTan * scene.Camera.ZNear;
     canvasSize = canvasSize.MulScal(2)
 
+    pCamera.Z = Max(scene.Camera.ZNear, Min(scene.Camera.ZFar, pCamera.Z))
     var pScreen Vector
     pScreen.X = scene.Camera.ZNear * pCamera.X / pCamera.Z
     pScreen.Y = scene.Camera.ZNear * pCamera.Y / -pCamera.Z
