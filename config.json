@@ -7,6 +7,6 @@
     "reportName": "report.json",
     "savePicture": true,
     "saveReport": true,
-    "sceneName" : "scenes/teapot-simplified.json",
+    "sceneName" : "scenes/cornell-box.json",
     "showDebug": false
 }

@@ -33,6 +33,15 @@
         },
         {
             "objectId": 0,
+            "position": { "x":0, "y":0, "z":-3 },
+            "rotation": { "x":0, "y":180, "z":0 },
+            "scale":    { "x":3, "y":3, "z":1 },
+            "materialLibId": 0,
+            "materialName": "black-wall",
+            "debugName": "back-wall"
+        },
+        {
+            "objectId": 0,
             "position": { "x":0, "y":-3, "z":1 },
             "rotation": { "x":90, "y":0, "z":0 },
             "scale":    { "x":3, "y":4.1, "z":1 },
@@ -87,9 +96,9 @@
         },
         {
             "objectId": 2,
-            "position": { "x":0, "y":0, "z":0 },
+            "position": { "x":0, "y":0, "z":-1 },
             "rotation": { "x":0, "y":0, "z":0 },
-            "scale":    { "x":1, "y":1, "z":1 },
+            "scale":    { "x":0.005, "y":0.005, "z":0.005 },
             "materialLibId": 0,
             "materialName": "glass-ball",
             "debugName": "sphere"

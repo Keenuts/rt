@@ -19,6 +19,16 @@ Kd 0.1803921 0.6156862 0.9058823
 newmtl red-wall
 Kd 0.8980392 0.2274509 0.2274509
 
+newmtl green-wall
+Kd 0.1803921 0.9058823 0.6156862
+
+newmtl black-wall
+Kd 0.1 0.1 0.1
+
 newmtl glass-ball
-Kd 0.9 0.8 1.0
+Kd 1.0 1.0 0.0
 d 0.1
+Refr 1.5169
+
+newmtl light-plane
+Ke 1.0 1.0 1.0
