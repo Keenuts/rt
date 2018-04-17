@@ -3,7 +3,7 @@ package main
 import (
     "bufio"
     "fmt"
-    "github.com/udhos/gwob"
+    "github.com/Keenuts/gwob"
     "os"
 );
 
