@@ -219,7 +219,7 @@ func IntersectObjects(ray Ray, objects []Object) (bool, Intersection) {
     return hit, intersection
 }
 
-func TraceRefraction(scene Scene, ray Ray, info Intersection) Vector {
+func TraceRefraction(scene Scene, ray Ray, info Intersection, lDepth float64) Vector {
     ratioOut := info.Object.Material.Refraction
     ratioIn := 1.0 / ratioOut
 
@@ -242,11 +242,14 @@ func TraceRefraction(scene Scene, ray Ray, info Intersection) Vector {
         ray2.Direction = Refract(ray2.Direction, info2.Normal.Neg(), ratioOut)
     }
 
-    refracted, _ := TraceRay(scene, ray2)
+    refracted, _ := TraceRayDepth(scene, ray2, lDepth - 1)
     return refracted
 }
 
-func TraceRay(scene Scene, ray Ray) (Vector, float64) {
+func TraceRayDepth(scene Scene, ray Ray, leftDepth float64) (Vector, float64) {
+    if leftDepth <= 0 {
+        return Vector{0, 0, 0}, math.Inf(1)
+    }
 
     hit, info := IntersectObjects(ray, scene.Objects)
 
@@ -260,10 +263,16 @@ func TraceRay(scene Scene, ray Ray) (Vector, float64) {
     var refracted Vector
 
     if opacity < 1. {
-        refracted = TraceRefraction(scene, ray, info)
+        refracted = TraceRefraction(scene, ray, info, leftDepth)
+    } else {
+        refracted = diffuse
     }
 
 
     diffuse = diffuse.MulScal(opacity).Add(refracted.MulScal(1.0 - opacity))
     return Saturate(diffuse), info.Distance
+}
+
+func TraceRay(scene Scene, ray Ray) (Vector, float64) {
+    return TraceRayDepth(scene, ray, 8)
 }
