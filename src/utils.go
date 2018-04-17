@@ -129,3 +129,8 @@ func CheckerGetColor(v Vector) Vector {
     }
     return Vector{1, 1, 1}
 }
+
+func Fresnel(i, n Vector, eta float64) float64 {
+    facing := Clamp(0., 1., 1.0 - Max(i.Neg().Dot(n), 0.))
+    return Clamp(0., 1., eta + (1. - eta) * math.Pow(facing, 5))
+}

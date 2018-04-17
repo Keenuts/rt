@@ -252,15 +252,15 @@ func TraceRayDepth(scene Scene, ray Ray, leftDepth float64) (Vector, float64) {
     }
 
     hit, info := IntersectObjects(ray, scene.Objects)
-
     if !hit {
         return Vector{0, 0, 0}, math.Inf(1)
     }
 
     diffuse := info.Object.Material.Diffuse
     opacity := info.Object.Material.Opacity
+    specularLevel := info.Object.Material.SpecularLevel
 
-    var refracted Vector
+    var refracted, reflected Vector
 
     if opacity < 1. {
         refracted = TraceRefraction(scene, ray, info, leftDepth)
@@ -268,9 +268,23 @@ func TraceRayDepth(scene Scene, ray Ray, leftDepth float64) (Vector, float64) {
         refracted = diffuse
     }
 
+    fresnel := Fresnel(ray.Direction, info.Normal, 1.0 / 1.5161)
+    if specularLevel > 0. {
+        var reflRay Ray
+        reflRay.Origin = info.Position.Add(info.Normal.MulScal(EPSYLON))
+        reflRay.Direction = Reflect(ray.Direction, info.Normal)
+        reflected, _ = TraceRayDepth(scene, reflRay, leftDepth - 1)
+    }
 
-    diffuse = diffuse.MulScal(opacity).Add(refracted.MulScal(1.0 - opacity))
-    return Saturate(diffuse), info.Distance
+    refracted = refracted.MulScal(1. - fresnel)
+    reflected = reflected.MulScal(specularLevel * 0.001)
+    diffuse = diffuse.MulScal(1. - specularLevel * 0.001)
+
+    output := diffuse.Add(reflected)
+    output = output.MulScal(fresnel)
+    output = output.Add(refracted)
+
+    return Saturate(output), info.Distance
 }
 
 func TraceRay(scene Scene, ray Ray) (Vector, float64) {

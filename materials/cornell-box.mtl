@@ -26,9 +26,11 @@ newmtl black-wall
 Kd 0.1 0.1 0.1
 
 newmtl glass-ball
-Kd 1.0 1.0 0.0
+Kd 0.95 0.95 1.0
 d 0.1
 Refr 1.5169
+Ks 0 0 0
+Ns 10.0
 
 newmtl light-plane
 Ke 1.0 1.0 1.0
