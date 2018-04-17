@@ -99,7 +99,7 @@ type Object struct {
 type MaterialLib map[string]Material
 
 type Material struct {
-    Diffuse, Specular Vector
+    Diffuse, Specular, Emission Vector
     Opacity float64
     Refraction float64
     SpecularLevel float64

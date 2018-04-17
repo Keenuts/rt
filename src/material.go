@@ -29,6 +29,7 @@ func MaterialLibFromMTL(filename string) (lib MaterialLib) {
 
         m.Diffuse = Vector{ value.Kd[0], value.Kd[1], value.Kd[2] }
         m.Specular = Vector{ value.Ks[0], value.Ks[1], value.Ks[2] }
+        m.Emission = Vector{ value.Ke[0], value.Ke[1], value.Ke[2] }
         m.Opacity = value.D
         m.Refraction = value.Refr
         m.SpecularLevel = value.Ns

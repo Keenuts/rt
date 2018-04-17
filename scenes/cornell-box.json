@@ -102,6 +102,15 @@
             "materialLibId": 0,
             "materialName": "glass-ball",
             "debugName": "sphere"
+        },
+        {
+            "objectId": 1,
+            "position": { "x":0, "y":3, "z":0 },
+            "rotation": { "x":0, "y":0, "z":0 },
+            "scale":    { "x":1, "y":0.1, "z":1 },
+            "materialLibId": 0,
+            "materialName": "light-box",
+            "debugName": "light-box"
         }
     ]
 }

@@ -32,5 +32,6 @@ Refr 1.5169
 Ks 0 0 0
 Ns 10.0
 
-newmtl light-plane
-Ke 1.0 1.0 1.0
+newmtl light-box
+Kd 1 1 1
+Ke 5.0 5.0 5.0
