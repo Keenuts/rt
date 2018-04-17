@@ -257,31 +257,31 @@ func TraceRayDepth(scene Scene, ray Ray, leftDepth float64) (Vector, float64) {
     }
 
     diffuse := info.Object.Material.Diffuse
-    opacity := info.Object.Material.Opacity
     specularLevel := info.Object.Material.SpecularLevel
 
-    var refracted, reflected Vector
-
-    if opacity < 1. {
-        refracted = TraceRefraction(scene, ray, info, leftDepth)
-    } else {
-        refracted = diffuse
-    }
-
-    fresnel := Fresnel(ray.Direction, info.Normal, 1.0 / 1.5161)
+    var reflected Vector
     if specularLevel > 0. {
         var reflRay Ray
         reflRay.Origin = info.Position.Add(info.Normal.MulScal(EPSYLON))
         reflRay.Direction = Reflect(ray.Direction, info.Normal)
         reflected, _ = TraceRayDepth(scene, reflRay, leftDepth - 1)
     }
-
-    refracted = refracted.MulScal(1. - fresnel)
     reflected = reflected.MulScal(specularLevel * 0.001)
-    diffuse = diffuse.MulScal(1. - specularLevel * 0.001)
 
-    output := diffuse.Add(reflected)
-    output = output.MulScal(fresnel)
+    var fresnel float64
+    var refracted Vector
+    opacity := info.Object.Material.Opacity
+    if opacity < 1. {
+        refracted = TraceRefraction(scene, ray, info, leftDepth)
+        fresnel = Fresnel(ray.Direction, info.Normal, 1.0 / 1.5161)
+    } else {
+        refracted = diffuse
+        fresnel = 1.
+    }
+    refracted = refracted.MulScal(1. - fresnel)
+
+    output := diffuse.MulScal(1. - specularLevel * 0.001)
+    output = output.Add(reflected).MulScal(fresnel)
     output = output.Add(refracted)
 
     return Saturate(output), info.Distance
