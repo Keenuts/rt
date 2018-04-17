@@ -227,24 +227,22 @@ func TraceRefraction(scene Scene, ray Ray, info Intersection) Vector {
     norA := info.Normal
 
     var ray2 Ray
-    ray2.Origin = posA.Add(norA.MulScal(-EPSYLON))
-    ray2.Direction = refract(ray.Direction, info.Normal, ratioIn)
+    ray2.Origin = posA.Add(norA.MulScal(-10. * EPSYLON))
+    ray2.Direction = Refract(ray.Direction, info.Normal, ratioIn)
     ray2.InvertCulling = true
 
     hit2, info2 := Intersect(ray2, info.Object)
+    ray2.InvertCulling = false
 
-    if !hit2 || info2.Object.ID != info.Object.ID {
-        return info.Object.Material.Diffuse
+    if hit2 && info.Object.ID == info2.Object.ID {
+        posB := info2.Position
+        norB := info2.Normal
+
+        ray2.Origin = posB.Add(norB.MulScal(10. * EPSYLON))
+        ray2.Direction = Refract(ray2.Direction, info2.Normal.Neg(), ratioOut)
     }
 
-    posB := info2.Position
-    norB := info2.Normal
-
-    var ray3 Ray
-    ray3.Origin = posB.Add(norB.MulScal(EPSYLON))
-    ray3.Direction = refract(ray2.Direction, info2.Normal.Neg(), ratioOut)
-
-    refracted, _ := TraceRay(scene, ray3)
+    refracted, _ := TraceRay(scene, ray2)
     return refracted
 }
 
@@ -259,11 +257,13 @@ func TraceRay(scene Scene, ray Ray) (Vector, float64) {
     diffuse := info.Object.Material.Diffuse
     opacity := info.Object.Material.Opacity
 
-    if opacity < 1.0 - EPSYLON {
-        refracted := TraceRefraction(scene, ray, info)
-        diffuse = diffuse.MulScal(opacity).Add(refracted.MulScal(1.0 - opacity))
+    var refracted Vector
+
+    if opacity < 1. {
+        refracted = TraceRefraction(scene, ray, info)
     }
 
 
+    diffuse = diffuse.MulScal(opacity).Add(refracted.MulScal(1.0 - opacity))
     return Saturate(diffuse), info.Distance
 }

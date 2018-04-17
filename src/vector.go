@@ -75,23 +75,25 @@ func MaxVec(a, b Vector) Vector {
     return Vector{Max(a.X, b.X), Max(a.Y, b.Y), Max(a.Z, b.Z)}
 }
 
-func reflect(in, n Vector) (out Vector) {
+func Reflect(in, n Vector) (out Vector) {
     in = in.Normalize()
     n = n.Normalize()
 
     return in.Sub(n.MulScal(2. * n.Dot(in)))
 }
 
-func refract(in, n Vector, eta float64) (out Vector) {
+func Refract(i, n Vector, eta float64) (out Vector) {
     n = n.Normalize()
-    in = in.Normalize()
+    i = i.Normalize()
 
-    cosi := in.Neg().Dot(n)
+    cosi := i.Neg().Dot(n)
     cost2 := 1. - eta * eta * (1. - cosi * cosi)
-    t := in.MulScal(eta).Add(n.MulScal(cosi * eta - math.Sqrt(math.Abs(cost2))))
+
+    x := eta * cosi - math.Sqrt(math.Abs(cost2))
+    t := i.MulScal(eta).Add(n.MulScal(x))
 
     if cost2 > 0 {
         return t
     }
-    return Vector{}
+    return i
 }
