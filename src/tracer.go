@@ -253,8 +253,8 @@ func GetDiffuse(info Intersection) Vector {
         return mtl.Diffuse
     }
 
-    x := mtl.DiffuseTex.Width * int(info.UV.X)
-    y := mtl.DiffuseTex.Height * int(info.UV.Y)
+    x := int(float64(mtl.DiffuseTex.Width) * info.UV.X)
+    y := int(float64(mtl.DiffuseTex.Height) * info.UV.Y)
 
     color := mtl.DiffuseTex.Pixels.At(x, y)
 
