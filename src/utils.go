@@ -42,6 +42,16 @@ func Saturate(v Vector) Vector {
     }
 }
 
+func ColorToVector(c color.Color) Vector {
+    values := c.(color.RGBA)
+
+    return Vector{
+        float64(values.R) / 255.,
+        float64(values.G) / 255.,
+        float64(values.B) / 255.,
+    }
+}
+
 func VectorToRGBA(v Vector) color.RGBA {
     return color.RGBA{
         uint8(v.X * 255.),

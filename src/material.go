@@ -37,6 +37,5 @@ func MaterialLibFromMTL(filename string) (lib MaterialLib) {
     }
 
     fmt.Printf("done\n")
-    fmt.Println(lib)
     return
 }
