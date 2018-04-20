@@ -246,21 +246,6 @@ func TraceRefraction(scene Scene, ray Ray, info Intersection, lDepth float64) Ve
     return refracted
 }
 
-func GetDiffuse(info Intersection) Vector {
-    mtl := info.Object.Material
-
-    if mtl.DiffuseTex == nil {
-        return mtl.Diffuse
-    }
-
-    x := int(float64(mtl.DiffuseTex.Width) * info.UV.X)
-    y := int(float64(mtl.DiffuseTex.Height) * info.UV.Y)
-
-    color := mtl.DiffuseTex.Pixels.At(x, y)
-
-    return ColorToVector(color)
-}
-
 func TraceRayDepth(scene Scene, ray Ray, leftDepth float64) (Vector, float64) {
     if leftDepth <= 0 {
         return Vector{0, 0, 0}, math.Inf(1)
@@ -271,7 +256,7 @@ func TraceRayDepth(scene Scene, ray Ray, leftDepth float64) (Vector, float64) {
         return Vector{0, 0, 0}, math.Inf(1)
     }
 
-    diffuse := GetDiffuse(info)
+    diffuse := MtlGetDiffuse(info)
     specularLevel := info.Object.Material.SpecularLevel
 
     var reflected Vector

@@ -39,3 +39,18 @@ func MaterialLibFromMTL(filename string) (lib MaterialLib) {
     fmt.Printf("done\n")
     return
 }
+
+func MtlGetDiffuse(info Intersection) Vector {
+    mtl := info.Object.Material
+
+    if mtl.DiffuseTex == nil {
+        return mtl.Diffuse
+    }
+
+    x := int(float64(mtl.DiffuseTex.Width) * info.UV.X)
+    y := int(float64(mtl.DiffuseTex.Height) * info.UV.Y)
+
+    color := mtl.DiffuseTex.Pixels.At(x, y)
+
+    return ColorToVector(color)
+}
