@@ -5,7 +5,7 @@ import "fmt"
 func CreateObject(desc SceneObject, model Model, mtl Material) (out Object) {
     fmt.Printf("preprocessing %s...", model.Name)
 
-    out.Name = model.Name
+    out.Name = desc.DebugName
 
     out.Triangles = make([]Triangle, len(model.Triangles))
     copy(out.Triangles, model.Triangles)
