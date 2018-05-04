@@ -10,7 +10,19 @@ Ks 0 0 0
 d 1.0
     Tr 0.1
 
-newmtl white-wall
+newmtl front-wall
+Kd 1. 1. 1.
+
+newmtl ground
+Kd 1. 1. 1.
+
+newmtl roof
+Kd 1. 1. 1.
+
+newmtl white-box-tall
+Kd 1. 1. 1.
+
+newmtl white-box-small
 Kd 1. 1. 1.
 
 newmtl blue-wall
@@ -22,15 +34,15 @@ Kd 0.8980392 0.2274509 0.2274509
 newmtl green-wall
 Kd 0.1803921 0.9058823 0.6156862
 
-newmtl black-wall
+newmtl back-wall
 Kd 0.1 0.1 0.1
 
 newmtl glass-ball
 Kd 0.95 0.95 1.0
-d 0.1
+d 0.05
 Refr 1.5169
-Ks 0 0 0
-Ns 10.0
+Ks 1. 1. 1.
+Ns 90.0
 
 newmtl light-box
 Kd 1 1 1
