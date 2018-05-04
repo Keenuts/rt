@@ -160,19 +160,19 @@ func Fresnel(i, n Vector, eta float64) float64 {
     return Clamp(0., 1., eta + (1. - eta) * math.Pow(facing, 5))
 }
 
-func RandomUnitVector() Vector {
+func RandomUnitVector(gen *rand.Rand) Vector {
     var v Vector
 
     for v.X * v.X + v.Y * v.Y + v.Z * v.Z < EPSYLON {
-        v = Vector{ rand.Float64(), rand.Float64(), rand.Float64() }
+        v = Vector{ gen.Float64(), gen.Float64(), gen.Float64() }
         v = v.AddScal(-.5).MulScal(2.)
     }
 
     return v.Normalize()
 }
 
-func RandomHemisphereVector(normal Vector) Vector {
-    v := RandomUnitVector()
+func RandomHemisphereVector(gen *rand.Rand, normal Vector) Vector {
+    v := RandomUnitVector(gen)
 
     if v.Dot(normal) < 0 {
         return v.Neg()

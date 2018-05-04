@@ -3,6 +3,7 @@ package main
 import (
     "image"
     "image/color"
+    "math/rand"
 );
 
 // Maths
@@ -44,6 +45,7 @@ type Scene struct {
 
     Camera Camera
     Objects []Object
+    Random *rand.Rand
 }
 
 type Config struct {

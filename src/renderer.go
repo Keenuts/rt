@@ -4,6 +4,7 @@ import (
     "fmt"
     "image"
     "image/draw"
+    "math/rand"
     "sync"
     "time"
 );
@@ -96,8 +97,12 @@ func RenderScene(config Config, scene Scene) *image.RGBA {
     wg.Add(config.MaxThreads + 1)
 
     for i := 0; i < config.MaxThreads; i++ {
-        go func () {
+        go func (scene Scene) {
             defer wg.Done()
+
+            src := rand.NewSource(time.Now().UnixNano())
+            gen := rand.New(src)
+            scene.Random = gen
 
             for len(taskList) > 0 {
 
@@ -117,7 +122,7 @@ func RenderScene(config Config, scene Scene) *image.RGBA {
 
                 mux.Unlock()
             }
-        }()
+        }(scene)
     }
 
     go func() {
