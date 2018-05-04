@@ -3,6 +3,7 @@ package main
 import (
     "image/color"
     "math"
+    "math/rand"
 );
 
 func Lerp(a, b, x float64) float64 {
@@ -157,4 +158,24 @@ func CheckerGetColor(v Vector) Vector {
 func Fresnel(i, n Vector, eta float64) float64 {
     facing := Clamp(0., 1., 1.0 - Max(i.Neg().Dot(n), 0.))
     return Clamp(0., 1., eta + (1. - eta) * math.Pow(facing, 5))
+}
+
+func RandomUnitVector() Vector {
+    var v Vector
+
+    for v.X * v.X + v.Y * v.Y + v.Z * v.Z < EPSYLON {
+        v = Vector{ rand.Float64(), rand.Float64(), rand.Float64() }
+        v = v.AddScal(-.5).MulScal(2.)
+    }
+
+    return v.Normalize()
+}
+
+func RandomHemisphereVector(normal Vector) Vector {
+    v := RandomUnitVector()
+
+    if v.Dot(normal) < 0 {
+        return v.Neg()
+    }
+    return v
 }
