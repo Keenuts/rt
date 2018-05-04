@@ -30,6 +30,20 @@ func AbsInt(a int) int {
     return -a
 }
 
+func MaxInt(a, b int) int {
+    if a > b {
+        return a
+    }
+    return b
+}
+
+func MinInt(a, b int) int {
+    if a < b {
+        return a
+    }
+    return b
+}
+
 func Clamp(a, b, x float64) float64 {
     return Max(a, Min(b, x))
 }
