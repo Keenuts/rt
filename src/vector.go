@@ -46,6 +46,10 @@ func (v Vector) Magnitude() float64 {
     return math.Sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z)
 }
 
+func (v Vector) IsZero() bool {
+    return IsZero(v.X) && IsZero(v.Y) && IsZero(v.Z)
+}
+
 func (v Vector) Normalize() Vector {
     norm := v.Magnitude()
     if norm < EPSYLON && norm > -EPSYLON {
