@@ -83,7 +83,7 @@ func Reflect(in, n Vector) Vector {
     in = in.Normalize()
     n = n.Normalize()
 
-    return in.Sub(n.MulScal(2. * n.Dot(in)))
+    return in.Sub(n.MulScal(2. * n.Dot(in))).Normalize()
 }
 
 func Refract(i, n Vector, eta float64) Vector {
