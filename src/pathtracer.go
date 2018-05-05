@@ -4,6 +4,9 @@ import (
     "math"
 );
 
+const SAMPLE_PER_PIXEL = 32
+const MAX_PATH_DEPTH = 8
+
 func traceRefraction(scene Scene, ray Ray, info Intersection, depth int) Vector {
     ratioOut := info.Object.Material.Refraction
     ratioIn := 1.0 / ratioOut
@@ -41,7 +44,7 @@ func backtraceLight(scene Scene, info Intersection) (Vector) {
     mask := Vector{ 1, 1, 1 }
     light := Vector{ 0, 0, 0 }
 
-    for i := 0; i < 12; i++ {
+    for i := 0; i < MAX_PATH_DEPTH; i++ {
         ray.Origin = info.Position.Add(info.Normal.MulScal(EPSYLON))
         ray.Direction = RandomHemisphereVector(scene.Random, info.Normal)
 
@@ -142,14 +145,13 @@ func TraceRay(scene Scene, ray Ray) (Vector, float64) {
     color := Vector{ 0, 0, 0 }
     distance := 0.
 
-    const SAMPLE_COUNT = 32
-    for i := 0; i < SAMPLE_COUNT; i++ {
+    for i := 0; i < SAMPLE_PER_PIXEL; i++ {
         sample, dist := traceRayDepth(scene, ray, 8)
         if i == 0 {
             distance = dist
         }
 
-        color = color.Add(sample.MulScal(1. / float64(SAMPLE_COUNT)))
+        color = color.Add(sample.MulScal(1. / float64(SAMPLE_PER_PIXEL)))
     }
 
     return Saturate(color), distance
