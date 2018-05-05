@@ -166,7 +166,7 @@ func IntersectKDTree(ray Ray, tree *KDTree) (touch bool, out Intersection) {
         }
     }
 
-    for _, tri := range tree.Triangles {
+    for _, tri := range tree.Value.([]Triangle) {
         hit, info := IntersectTri(ray, tri)
 
         info.Distance = info.Position.Sub(ray.Origin).Magnitude()
@@ -217,4 +217,31 @@ func IntersectObjects(ray Ray, objects []Object) (bool, Intersection) {
     }
 
     return hit, intersection
+}
+
+func GetRefractedRay(scene Scene, ray Ray, info Intersection) (rayIn, rayOut Ray) {
+    ratioOut := info.Object.Material.Refraction
+    ratioIn := 1.0 / ratioOut
+
+    posA := info.Position
+    norA := info.Normal
+
+    rayIn.Origin = posA.Add(norA.MulScal(-1. * EPSYLON))
+    rayIn.Direction = Refract(ray.Direction, info.Normal, ratioIn)
+    rayIn.InvertCulling = true
+
+    hit2, info2 := Intersect(rayIn, info.Object)
+
+    if hit2 && info.Object.ID == info2.Object.ID {
+        posB := info2.Position
+        norB := info2.Normal
+
+        rayOut.Origin = posB.Add(norB.MulScal(1. * EPSYLON))
+        rayOut.Direction = Refract(rayIn.Direction, info2.Normal.Neg(), ratioOut)
+    } else {
+        rayOut = rayIn
+    }
+
+    rayOut.InvertCulling = false
+    return
 }

@@ -4,37 +4,7 @@ import (
     "math"
 );
 
-const SAMPLE_PER_PIXEL = 32
-const MAX_PATH_DEPTH = 8
-
-func traceRefraction(scene Scene, ray Ray, info Intersection, depth int) Vector {
-    ratioOut := info.Object.Material.Refraction
-    ratioIn := 1.0 / ratioOut
-
-    posA := info.Position
-    norA := info.Normal
-
-    var ray2 Ray
-    ray2.Origin = posA.Add(norA.MulScal(-1. * EPSYLON))
-    ray2.Direction = Refract(ray.Direction, info.Normal, ratioIn)
-    ray2.InvertCulling = true
-
-    hit2, info2 := Intersect(ray2, info.Object)
-    ray2.InvertCulling = false
-
-    if hit2 && info.Object.ID == info2.Object.ID {
-        posB := info2.Position
-        norB := info2.Normal
-
-        ray2.Origin = posB.Add(norB.MulScal(1. * EPSYLON))
-        ray2.Direction = Refract(ray2.Direction, info2.Normal.Neg(), ratioOut)
-    }
-
-    refracted, _ := traceRayDepth(scene, ray2, depth - 1)
-    return refracted
-}
-
-func backtraceLight(scene Scene, info Intersection) (Vector) {
+func ptBacktraceLight(scene Scene, info Intersection) (Vector) {
     if !info.Object.Material.Emission.IsZero() {
         return info.Object.Material.Emission
     }
@@ -96,7 +66,7 @@ func backtraceLight(scene Scene, info Intersection) (Vector) {
     return light
 }
 
-func traceRayDepth(scene Scene, ray Ray, depth int) (Vector, float64) {
+func ptTraceRayDepth(scene Scene, ray Ray, depth int) (Vector, float64) {
     if depth <= 0 {
         return Vector{0, 0, 0}, math.Inf(1)
     }
@@ -107,7 +77,7 @@ func traceRayDepth(scene Scene, ray Ray, depth int) (Vector, float64) {
     }
 
     diffuse := MtlGetDiffuse(info)
-    light := backtraceLight(scene, info)
+    light := ptBacktraceLight(scene, info)
     diffuse = diffuse.Scale(light)
 
     specularLevel := info.Object.Material.SpecularLevel
@@ -117,7 +87,7 @@ func traceRayDepth(scene Scene, ray Ray, depth int) (Vector, float64) {
         var reflRay Ray
         reflRay.Origin = info.Position.Add(info.Normal.MulScal(EPSYLON))
         reflRay.Direction = Reflect(ray.Direction, info.Normal)
-        reflected, _ = traceRayDepth(scene, reflRay, depth - 1)
+        reflected, _ = ptTraceRayDepth(scene, reflRay, depth - 1)
     }
     reflected = reflected.MulScal(specularLevel * 0.001)
 
@@ -125,7 +95,8 @@ func traceRayDepth(scene Scene, ray Ray, depth int) (Vector, float64) {
     var refracted Vector
     opacity := info.Object.Material.Opacity
     if opacity < 1. {
-        refracted = traceRefraction(scene, ray, info, depth)
+        _, rayOut := GetRefractedRay(scene, ray, info)
+        refracted, _ = ptTraceRayDepth(scene, rayOut, depth - 1)
         fresnel = Fresnel(ray.Direction, info.Normal, 1.0 / 1.5161)
     } else {
         refracted = diffuse
@@ -140,18 +111,18 @@ func traceRayDepth(scene Scene, ray Ray, depth int) (Vector, float64) {
     return output, info.Distance
 }
 
-func TraceRay(scene Scene, ray Ray) (Vector, float64) {
+func PathtracerRender(scene Scene, ray Ray) (Vector, float64) {
 
     color := Vector{ 0, 0, 0 }
     distance := 0.
 
-    for i := 0; i < SAMPLE_PER_PIXEL; i++ {
-        sample, dist := traceRayDepth(scene, ray, 8)
+    for i := 0; i < PT_SAMPLE_PER_PIXEL; i++ {
+        sample, dist := ptTraceRayDepth(scene, ray, 8)
         if i == 0 {
             distance = dist
         }
 
-        color = color.Add(sample.MulScal(1. / float64(SAMPLE_PER_PIXEL)))
+        color = color.Add(sample.MulScal(1. / float64(PT_SAMPLE_PER_PIXEL)))
     }
 
     return Saturate(color), distance

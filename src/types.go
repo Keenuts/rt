@@ -46,6 +46,7 @@ type Scene struct {
     Camera Camera
     Objects []Object
     Random *rand.Rand
+    PhotonMap *KDTree
 }
 
 type Config struct {
@@ -130,7 +131,7 @@ type KDTree struct {
     Left, Right *KDTree
 
     BoundingBox Box
-    Triangles []Triangle
+    Value interface{}
 }
 
 type Frame struct {
