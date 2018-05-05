@@ -22,7 +22,7 @@ type SceneFile struct {
     SceneObjects []SceneObject
 }
 
-func CreateDirectory(path string) bool {
+func createDirectory(path string) bool {
     if _, err := os.Stat(path); os.IsNotExist(err) {
         err = os.MkdirAll(path, 0755)
         if err != nil {
@@ -33,7 +33,7 @@ func CreateDirectory(path string) bool {
     return true
 }
 
-func LoadJSON(filename string, storage interface{}) {
+func loadJSON(filename string, storage interface{}) {
     content, err := ioutil.ReadFile(filename)
     if err != nil {
         panic(err)
@@ -49,7 +49,7 @@ func LoadJSON(filename string, storage interface{}) {
     }
 }
 
-func SceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (out Scene) {
+func sceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (out Scene) {
     out.Name = file.Name
     out.OutputSize = file.OutputSize
     out.Camera = file.Camera
@@ -78,31 +78,8 @@ func SceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (ou
     return
 }
 
-func LoadScene(filename string) Scene {
-    var file SceneFile
-    LoadJSON(filename, &file)
-
-    var models []Model
-    for _,path := range file.Meshs {
-        models = append(models, ModelFromOBJ(path))
-    }
-
-    var materialLibs []MaterialLib
-    for _,path := range file.MaterialLibs {
-        materialLibs = append(materialLibs, MaterialLibFromMTL(path))
-    }
-
-    return SceneFileToScene(file, models, materialLibs)
-}
-
-func LoadConfig(filename string) Config {
-    var out Config
-    LoadJSON(filename, &out)
-    return out
-}
-
-func GetFileHandleToDisk(config Config, prefix string, ext string, alt string) *os.File {
-    if !CreateDirectory(config.OutputDir) {
+func getFileHandleToDisk(config Config, prefix string, ext string, alt string) *os.File {
+    if !createDirectory(config.OutputDir) {
         panic("unable to create output directory")
     }
 
@@ -123,6 +100,29 @@ func GetFileHandleToDisk(config Config, prefix string, ext string, alt string) *
     return f
 }
 
+func LoadScene(filename string) Scene {
+    var file SceneFile
+    loadJSON(filename, &file)
+
+    var models []Model
+    for _,path := range file.Meshs {
+        models = append(models, ModelFromOBJ(path))
+    }
+
+    var materialLibs []MaterialLib
+    for _,path := range file.MaterialLibs {
+        materialLibs = append(materialLibs, MaterialLibFromMTL(path))
+    }
+
+    return sceneFileToScene(file, models, materialLibs)
+}
+
+func LoadConfig(filename string) Config {
+    var out Config
+    loadJSON(filename, &out)
+    return out
+}
+
 func WriteReportToDisk(config Config, infos RenderInfo) {
     if !config.SaveReport {
         return
@@ -133,7 +133,7 @@ func WriteReportToDisk(config Config, infos RenderInfo) {
         panic("unable to serialize rendering informations")
     }
 
-    f := GetFileHandleToDisk(config, "report-", ".json", config.ReportName)
+    f := getFileHandleToDisk(config, "report-", ".json", config.ReportName)
     defer f.Close()
 
     fmt.Printf("writting report...\r")
@@ -146,7 +146,7 @@ func WriteImageToDisk(config Config, buffer *image.RGBA) {
         return
     }
 
-    f := GetFileHandleToDisk(config, "output-", ".png", config.PictureName)
+    f := getFileHandleToDisk(config, "output-", ".png", config.PictureName)
     defer f.Close()
 
     fmt.Printf("writting picture...\r")

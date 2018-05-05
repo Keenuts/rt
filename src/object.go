@@ -2,26 +2,7 @@ package main
 
 import "fmt"
 
-func CreateObject(desc SceneObject, model Model, mtl Material) (out Object) {
-    fmt.Printf("preprocessing %s...", model.Name)
-
-    out.Name = desc.DebugName
-
-    out.Triangles = make([]Triangle, len(model.Triangles))
-    copy(out.Triangles, model.Triangles)
-
-    ObjectTransform(out, desc)
-
-    out.Center = MeshFindCenter(out.Triangles)
-    out.BoundingBox, out.BoundingSphere = MeshFindBounds(out.Triangles)
-    out.Tree = TreeCreate(out.Triangles)
-    out.Material = mtl
-
-    fmt.Printf("done\n")
-    return
-}
-
-func ObjectTransform(obj Object, desc SceneObject) {
+func objectTransform(obj Object, desc SceneObject) {
 
     for i, tri := range obj.Triangles {
 
@@ -41,4 +22,23 @@ func ObjectTransform(obj Object, desc SceneObject) {
 
         obj.Triangles[i] = tri
     }
+}
+
+func CreateObject(desc SceneObject, model Model, mtl Material) (out Object) {
+    fmt.Printf("preprocessing %s...", model.Name)
+
+    out.Name = desc.DebugName
+
+    out.Triangles = make([]Triangle, len(model.Triangles))
+    copy(out.Triangles, model.Triangles)
+
+    objectTransform(out, desc)
+
+    out.Center = MeshFindCenter(out.Triangles)
+    out.BoundingBox, out.BoundingSphere = MeshFindBounds(out.Triangles)
+    out.Tree = TreeCreate(out.Triangles)
+    out.Material = mtl
+
+    fmt.Printf("done\n")
+    return
 }

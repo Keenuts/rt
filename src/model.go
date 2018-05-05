@@ -7,17 +7,17 @@ import (
     "os"
 );
 
-func TriangleGetVertex(obj *gwob.Obj, stride int) Vector {
+func triangleGetVertex(obj *gwob.Obj, stride int) Vector {
     x, y, z := obj.VertexCoordinates(stride)
     return Vector{ x, y, z }
 }
 
-func TriangleGetNormal(obj *gwob.Obj, stride int) Vector {
+func triangleGetNormal(obj *gwob.Obj, stride int) Vector {
     x, y, z := obj.NormCoordinates(stride)
     return Vector{ x, y, z }
 }
 
-func TriangleGetUV(obj *gwob.Obj, stride int) Vector {
+func triangleGetUV(obj *gwob.Obj, stride int) Vector {
     x, y := obj.TextCoordinates(stride)
     return Vector{ x, y, 0 }
 }
@@ -58,12 +58,12 @@ func ModelFromOBJ(filename string) (model Model) {
         var vtx, nrm, uv [3]Vector
 
         for j := 0; j < 3; j++ {
-            vtx[j] = TriangleGetVertex(obj, obj.Indices[i + j])
+            vtx[j] = triangleGetVertex(obj, obj.Indices[i + j])
         }
 
         if obj.NormCoordFound {
             for j := 0; j < 3; j++ {
-                nrm[j] = TriangleGetNormal(obj, obj.Indices[i + j])
+                nrm[j] = triangleGetNormal(obj, obj.Indices[i + j])
             }
         } else {
             normal := vtx[2].Sub(vtx[0]).Cross(vtx[1].Sub(vtx[0])).Normalize()
@@ -72,7 +72,7 @@ func ModelFromOBJ(filename string) (model Model) {
 
         if obj.TextCoordFound {
             for j := 0; j < 3; j++ {
-                uv[j] = TriangleGetUV(obj, obj.Indices[i + j])
+                uv[j] = triangleGetUV(obj, obj.Indices[i + j])
             }
         }
 

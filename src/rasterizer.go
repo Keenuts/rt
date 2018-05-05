@@ -6,7 +6,7 @@ import (
     "math"
 );
 
-func DrawLine2D(line Line, frame Frame) {
+func drawLine2D(line Line, frame Frame) {
     x0, x1, y0, y1 := int(line.A.X), int(line.B.X), int(line.A.Y), int(line.B.Y)
     direction := line.A.Sub(line.B).Normalize()
 
@@ -43,7 +43,7 @@ func DrawLine2D(line Line, frame Frame) {
     }
 }
 
-func WorldToCamera(p Vector, camera Camera) Vector {
+func worldToCamera(p Vector, camera Camera) Vector {
     var tR Mat3
     right := camera.Up.Cross(camera.Forward).Neg()
 
@@ -54,7 +54,7 @@ func WorldToCamera(p Vector, camera Camera) Vector {
     return tR.Mul(p.Sub(camera.Position))
 }
 
-func CameraToScreen(scene Scene, pCamera Vector) Vector {
+func cameraToScreen(scene Scene, pCamera Vector) Vector {
     fov := scene.Camera.Fov * .5 * DEG2RAD
     fovTan := math.Tan(fov)
     aspectRatio := float64(scene.OutputSize[0]) / float64(scene.OutputSize[1])
@@ -83,21 +83,21 @@ func CameraToScreen(scene Scene, pCamera Vector) Vector {
     return pImage
 }
 
-func DrawGizmoLine(scene Scene, line Line, frame Frame) {
-    ca := WorldToCamera(line.A, scene.Camera)
-    cb := WorldToCamera(line.B, scene.Camera)
+func drawGizmoLine(scene Scene, line Line, frame Frame) {
+    ca := worldToCamera(line.A, scene.Camera)
+    cb := worldToCamera(line.B, scene.Camera)
 
-    sa := CameraToScreen(scene, ca)
-    sb := CameraToScreen(scene, cb)
+    sa := cameraToScreen(scene, ca)
+    sb := cameraToScreen(scene, cb)
 
     var line2D Line
     line2D.A = sa
     line2D.B = sb
     line2D.Color = line.Color
-    DrawLine2D(line2D, frame)
+    drawLine2D(line2D, frame)
 }
 
-func RasterizerDrawBoundingBox(scene Scene, box Box, col color.RGBA, frame Frame) {
+func rasterizerDrawBoundingBox(scene Scene, box Box, col color.RGBA, frame Frame) {
     var vtx [8]Vector
 
     vtx[0] = box.Min.Scale(Vector{1, 1, 1}).Add(box.Max.Scale(Vector{0, 0, 0}))
@@ -113,24 +113,24 @@ func RasterizerDrawBoundingBox(scene Scene, box Box, col color.RGBA, frame Frame
     for j := 0; j < 2; j++ {
         for i := 0; i < 4; i++ {
             line := Line{ vtx[i + j * 4], vtx[(i + 1) % 4 + j * 4], col }
-            DrawGizmoLine(scene, line, frame)
+            drawGizmoLine(scene, line, frame)
         }
     }
 
     for i := 0; i < 4; i++ {
         line := Line{ vtx[i], vtx[i + 4], col }
-        DrawGizmoLine(scene, line, frame)
+        drawGizmoLine(scene, line, frame)
     }
 }
 
-func RasterizerDrawTree(scene Scene, root KDTree, col color.RGBA, frame Frame) {
+func rasterizerDrawTree(scene Scene, root KDTree, col color.RGBA, frame Frame) {
     queue := []*KDTree { &root }
 
     for len(queue) > 0 {
         node := queue[0]
         queue = queue[1:]
 
-        RasterizerDrawBoundingBox(scene, node.BoundingBox, col, frame)
+        rasterizerDrawBoundingBox(scene, node.BoundingBox, col, frame)
 
         if node.Left != nil {
             queue = append(queue, node.Left)
@@ -142,7 +142,7 @@ func RasterizerDrawTree(scene Scene, root KDTree, col color.RGBA, frame Frame) {
     }
 }
 
-func RasterizerDrawPoint(scene Scene, point Point, frame Frame) {
+func rasterizerDrawPoint(scene Scene, point Point, frame Frame) {
     const SCALE = 0.02
 
     dist := scene.Camera.Position.Sub(point.Position).Magnitude()
@@ -150,20 +150,22 @@ func RasterizerDrawPoint(scene Scene, point Point, frame Frame) {
 
     min := point.Position.AddScal(-size * .5 * SCALE)
     max := point.Position.AddScal(size * .5 * SCALE)
-    RasterizerDrawBoundingBox(scene, Box{ min, max, 0 }, point.Color, frame)
+    rasterizerDrawBoundingBox(scene, Box{ min, max, 0 }, point.Color, frame)
 }
 
+// This function used built-in rasterizer to draw debug gizmos.
+// To be drawn, the showDebug boolean must be set to True in the config file.
 func RasterizerDrawDebug(scene Scene, frame Frame) {
     fmt.Printf("drawing debug informations...")
 
     green := color.RGBA{ 0, 255, 0, 255 }
     for _, o := range scene.Objects {
-        RasterizerDrawTree(scene, o.Tree, green, frame)
+        rasterizerDrawTree(scene, o.Tree, green, frame)
     }
 
     red := color.RGBA{ 255, 0, 0, 255 }
     for _, o := range scene.Objects {
-        RasterizerDrawBoundingBox(scene, o.BoundingBox, red, frame)
+        rasterizerDrawBoundingBox(scene, o.BoundingBox, red, frame)
     }
 
     fmt.Printf("done\n")

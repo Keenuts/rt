@@ -4,6 +4,10 @@ import (
     "time"
 )
 
+func TestFunc(a int) int {
+    return a
+}
+
 func main() {
     var infos RenderInfo
 
