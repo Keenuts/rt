@@ -35,7 +35,7 @@ type SceneObject struct {
 
 type Camera struct {
     Position, Forward, Up Vector
-    Fov float64
+    Fov, FocalDistance, ApertureSize float64
     ZNear, ZFar float64
 }
 
@@ -60,6 +60,7 @@ type Config struct {
     SaveReport bool
     SceneName string
     ShowDebug bool
+    DofSampleCount int
 }
 
 // Objects related

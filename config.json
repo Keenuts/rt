@@ -8,5 +8,6 @@
     "savePicture": true,
     "saveReport": true,
     "sceneName" : "scenes/cornell-box.json",
-    "showDebug": false
+    "showDebug": false,
+    "dofSampleCount": 1
 }
