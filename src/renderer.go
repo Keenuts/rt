@@ -76,8 +76,23 @@ func renderArea(config Config, scene Scene, task *Task) {
     for y := 0; y < config.BlockSize; y++ {
         for x := 0; x < config.BlockSize; x++ {
 
-            r := ScreenPointToRay(scene, task.Area.Min.X + x, task.Area.Min.Y + y)
-            color, depth := RaytracerRender(scene, r)
+
+            color, depth := Vector{ 0, 0, 0 }, 0.
+
+            rays := ScreenPointToRaysDOF(config, scene, task.Area.Min.X + x,
+                                                        task.Area.Min.Y + y)
+
+            for _, r := range rays {
+                sc, sd := RaytracerRender(scene, r)
+                color = color.Add(sc)
+                depth += sd
+            }
+
+            divisor := 1. / float64(len(rays))
+            color = color.MulScal(divisor)
+            depth = depth * divisor
+
+            //color, depth := RaytracerRender(scene, r)
             //color, depth := PathtracerRender(scene, r)
             //color, depth := PhotonMapRender(scene, r)
 
@@ -88,7 +103,7 @@ func renderArea(config Config, scene Scene, task *Task) {
 }
 
 func RenderScene(config Config, scene Scene) *image.RGBA {
-    //CreatePhotonMap(scene, 10)
+    //scene = CreatePhotonMap(scene, 10)
 
     taskList := createRenderTasks(config, scene)
     blockList := make([]Task, 0)
