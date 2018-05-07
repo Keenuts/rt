@@ -9,5 +9,5 @@
     "saveReport": true,
     "sceneName" : "scenes/cornell-box.json",
     "showDebug": false,
-    "dofSampleCount": 1
+    "dofSampleCount": 25
 }
