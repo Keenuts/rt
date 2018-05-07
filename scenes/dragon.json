@@ -8,7 +8,9 @@
             "up": { "x":0, "y":1, "z":0 },
             "fov": 45.0,
             "zNear": 1,
-            "zFar": 1000
+            "zFar": 1000,
+            "focalDistance": 19.0,
+            "apertureSize": 0.01
     },
 
     "Meshs": [
