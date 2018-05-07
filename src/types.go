@@ -46,7 +46,7 @@ type Scene struct {
     Camera Camera
     Objects []Object
     Random *rand.Rand
-    PhotonMap *KDTree
+    HasLight bool
 }
 
 type Config struct {

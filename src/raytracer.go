@@ -37,6 +37,12 @@ func getLambertDirectLight(scene Scene, info Intersection) (light Vector) {
     return
 }
 
+func getDefaultLighting(scene Scene, info Intersection) Vector {
+    direction := Vector{ 0.1, -0.9, -0.1 }.Normalize()
+
+    return Vector{ 1., 1., 1.}.MulScal(info.Normal.Dot(direction.Neg()))
+}
+
 func rtTraceRayDepth(scene Scene, ray Ray, depth int) (Vector, float64) {
     if depth <= 0 {
         return Vector{0, 0, 0}, math.Inf(1)
@@ -48,7 +54,13 @@ func rtTraceRayDepth(scene Scene, ray Ray, depth int) (Vector, float64) {
     }
 
     diffuse := MtlGetDiffuse(info)
-    light := getLambertDirectLight(scene, info)
+
+    var light Vector
+    if scene.HasLight {
+        light = getLambertDirectLight(scene, info)
+    } else {
+        light = getDefaultLighting(scene, info)
+    }
     diffuse = diffuse.Scale(light)
 
     specularLevel := info.Object.Material.SpecularLevel

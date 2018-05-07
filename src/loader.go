@@ -57,6 +57,7 @@ func sceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (ou
     out.Camera.Up = out.Camera.Up.Normalize()
     ObjectID := 0
 
+    hasLight := false
     for _, desc := range file.SceneObjects {
         if desc.ObjectID >= len(models) {
             panic("Invalid object ID")
@@ -79,6 +80,10 @@ func sceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (ou
             break
         }
 
+        if !mtl.Emission.IsZero() {
+            hasLight = true
+        }
+
         dst := CreateObject(desc, models[desc.ObjectID], mtl)
         dst.ID = ObjectID
 
@@ -86,6 +91,7 @@ func sceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (ou
         ObjectID += 1
     }
 
+    out.HasLight = hasLight
     return
 }
 
