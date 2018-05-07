@@ -63,12 +63,20 @@ func sceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (ou
         }
 
         var mtl Material
-        if len(mtlLibs) > desc.MaterialLibID {
-            mtl = mtlLibs[desc.MaterialLibID][desc.MaterialName]
-        } else {
+
+        for {
+            if len(mtlLibs) > desc.MaterialLibID {
+                entry, present := mtlLibs[desc.MaterialLibID][desc.MaterialName]
+                if present {
+                    mtl = entry
+                    break
+                }
+            }
+
             fmt.Println("\t/!\\ No material found. Using default.")
             mtl.Diffuse = Vector{ 1, 1, 1 }
             mtl.Opacity = 1.
+            break
         }
 
         dst := CreateObject(desc, models[desc.ObjectID], mtl)
