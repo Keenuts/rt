@@ -66,8 +66,11 @@ func sceneFileToScene(file SceneFile, models []Model, mtlLibs []MaterialLib) (ou
         if len(mtlLibs) > desc.MaterialLibID {
             mtl = mtlLibs[desc.MaterialLibID][desc.MaterialName]
         } else {
+            fmt.Println("\t/!\\ No material found. Using default.")
             mtl.Diffuse = Vector{ 1, 1, 1 }
+            mtl.Opacity = 1.
         }
+
         dst := CreateObject(desc, models[desc.ObjectID], mtl)
         dst.ID = ObjectID
 
