@@ -58,11 +58,24 @@ func cameraToScreen(scene Scene, pCamera Vector) Vector {
     fov := scene.Camera.Fov * .5 * DEG2RAD
     fovTan := math.Tan(fov)
     aspectRatio := float64(scene.OutputSize[0]) / float64(scene.OutputSize[1])
+    flippedRatio := false
+
+    if aspectRatio > 1. {
+        aspectRatio = float64(scene.OutputSize[1]) / float64(scene.OutputSize[0])
+        flippedRatio = true
+    }
 
     var canvasSize Vector
-    canvasSize.X = fovTan * scene.Camera.ZNear * aspectRatio
-    canvasSize.Y = fovTan * scene.Camera.ZNear;
+    canvasSize.X = fovTan * scene.Camera.ZNear
+    canvasSize.Y = fovTan * scene.Camera.ZNear
     canvasSize = canvasSize.MulScal(2)
+
+    if flippedRatio {
+        canvasSize.Y *= aspectRatio
+    } else {
+        canvasSize.X *= aspectRatio
+    }
+
 
     pCamera.Z = Max(scene.Camera.ZNear, Min(scene.Camera.ZFar, pCamera.Z))
     var pScreen Vector

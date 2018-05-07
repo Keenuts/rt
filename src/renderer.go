@@ -13,6 +13,7 @@ type Task struct {
     Area image.Rectangle
     Pixels *image.RGBA
     Depth [][]float64
+    Width, Height int
 };
 
 func blitDepthBuffer(out, in [][]float64, rect image.Rectangle) {
@@ -39,7 +40,16 @@ func createRenderTasks(config Config, scene Scene) (taskList []Task) {
         for x := 0; x < scene.OutputSize[0]; x += config.BlockSize {
 
             var task Task
-            task.Area = image.Rect(x, y, x + config.BlockSize, y + config.BlockSize)
+
+            task.Area.Min.X = x;
+            task.Area.Min.Y = y;
+
+            task.Width = MinInt(scene.OutputSize[0] - x, config.BlockSize)
+            task.Height = MinInt(scene.OutputSize[1] - y, config.BlockSize)
+
+            task.Area.Max.X = task.Area.Min.X + task.Width
+            task.Area.Max.Y = task.Area.Min.Y + task.Height
+
             taskList = append(taskList, task)
         }
     }
@@ -55,9 +65,9 @@ func renderWeldBlocks(scene Scene, blockList []Task) (frame Frame) {
     frame.Width = scene.OutputSize[0]
     frame.Height = scene.OutputSize[1]
 
-    for _, elt := range blockList {
-        draw.Draw(frame.Pixels, elt.Area, elt.Pixels, image.ZP, draw.Src)
-        blitDepthBuffer(frame.Depth, elt.Depth, elt.Area)
+    for _, patch := range blockList {
+        draw.Draw(frame.Pixels, patch.Area, patch.Pixels, image.ZP, draw.Src)
+        blitDepthBuffer(frame.Depth, patch.Depth, patch.Area)
     }
 
     fmt.Printf("welding blocks...done\n")
@@ -65,20 +75,18 @@ func renderWeldBlocks(scene Scene, blockList []Task) (frame Frame) {
 }
 
 func renderArea(config Config, scene Scene, task *Task) {
-    rect := image.Rect(0, 0, config.BlockSize, config.BlockSize)
+    rect := image.Rect(0, 0, task.Width, task.Height)
     task.Pixels = image.NewRGBA(rect)
-    task.Depth = createDepthBuffer(config.BlockSize, config.BlockSize)
+    task.Depth = createDepthBuffer(task.Width, task.Height)
 
     var frame Frame
     frame.Pixels = task.Pixels
     frame.Depth = task.Depth
 
-    for y := 0; y < config.BlockSize; y++ {
-        for x := 0; x < config.BlockSize; x++ {
-
+    for y := 0; y < task.Height; y++ {
+        for x := 0; x < task.Width; x++ {
 
             color, depth := Vector{ 0, 0, 0 }, 0.
-
             rays := ScreenPointToRaysDOF(config, scene, task.Area.Min.X + x,
                                                         task.Area.Min.Y + y)
 
@@ -92,10 +100,6 @@ func renderArea(config Config, scene Scene, task *Task) {
             color = color.MulScal(divisor)
             depth = depth * divisor
 
-            //color, depth := RaytracerRender(scene, r)
-            //color, depth := PathtracerRender(scene, r)
-            //color, depth := PhotonMapRender(scene, r)
-
             frame.Pixels.Set(x, y, VectorToRGBA(color))
             frame.Depth[y][x] = depth
         }
@@ -103,8 +107,6 @@ func renderArea(config Config, scene Scene, task *Task) {
 }
 
 func RenderScene(config Config, scene Scene) *image.RGBA {
-    //scene = CreatePhotonMap(scene, 10)
-
     taskList := createRenderTasks(config, scene)
     blockList := make([]Task, 0)
 

@@ -10,6 +10,13 @@ func screenPointToRay(scene Scene, x, y int) Ray {
     width := float64(scene.OutputSize[0])
     height := float64(scene.OutputSize[1])
     aspectRatio := width / height
+    flippedRatio := false
+
+    if aspectRatio > 1. {
+        aspectRatio = height / width
+        flippedRatio = true
+    }
+
     fov := DEG2RAD * scene.Camera.Fov * 0.5
 
     right := scene.Camera.Up.Cross(scene.Camera.Forward).Neg().Normalize()
@@ -22,8 +29,14 @@ func screenPointToRay(scene Scene, x, y int) Ray {
     zFar := scene.Camera.ZFar
 
     var pCamera Vector
-    pCamera.X = normCoords.X * (-zFar / zNear) * aspectRatio * -1.
-    pCamera.Y = normCoords.Y * (-zFar / zNear)
+
+    if flippedRatio {
+        pCamera.X = normCoords.X * (-zFar / zNear) * -1.
+        pCamera.Y = normCoords.Y * (-zFar / zNear) * aspectRatio
+    } else {
+        pCamera.X = normCoords.X * (-zFar / zNear) * aspectRatio * -1.
+        pCamera.Y = normCoords.Y * (-zFar / zNear)
+    }
     pCamera.Z = zFar
 
     pForward := scene.Camera.Forward.Normalize().MulScal(pCamera.Z)
