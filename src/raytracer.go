@@ -40,7 +40,10 @@ func getLambertDirectLight(scene Scene, info Intersection) (light Vector) {
 func getDefaultLighting(scene Scene, info Intersection) Vector {
     direction := Vector{ 0.1, -0.9, -0.1 }.Normalize()
 
-    return Vector{ 1., 1., 1.}.MulScal(info.Normal.Dot(direction.Neg()))
+    light := Vector{ 1., 1., 1.}.MulScal(info.Normal.Dot(direction.Neg()))
+    light = MaxVec(Vector{ 0.1, 0.1, 0.1 }, light)
+
+    return light
 }
 
 func rtTraceRayDepth(scene Scene, ray Ray, depth int) (Vector, float64) {
